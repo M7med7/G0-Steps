@@ -1,0 +1,381 @@
+/* The 1280×800 kiosk frame, its top bar, panes, and shared controls. */
+.stage {
+  max-width: 1280px;
+  margin-inline: auto;
+  position: relative;
+}
+
+.kiosk {
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  width: 1280px;
+  height: 800px;
+  transform-origin: top left;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 0 0 10px var(--primary-strong), 0 18px 40px -12px rgb(19 38 42 / 45%);
+  font-size: var(--k-body);
+}
+
+/* Top bar */
+.k-top {
+  height: 84px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-inline: 36px;
+  background: var(--surface-raised);
+  border-block-end: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand b {
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--primary-strong);
+  white-space: nowrap;
+}
+
+.brand small {
+  display: block;
+  margin-block-start: -2px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.logo {
+  width: 40px;
+  height: 44px;
+  flex: none;
+}
+
+.logo-shield {
+  fill: var(--primary);
+}
+
+.logo-print {
+  fill: var(--surface);
+}
+
+.logo-accent {
+  fill: var(--accent);
+}
+
+.rail {
+  display: flex;
+  gap: 6px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.rail li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 17px;
+  color: var(--text-muted);
+}
+
+.rail li i {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.rail li.done i {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.rail li.now {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.rail li.now i {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sim-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--warning-tint);
+  color: var(--warning-ink);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sim-badge .icon-dot {
+  width: 12px;
+  height: 12px;
+}
+
+/* Panes */
+.k-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.guide,
+.risk-band {
+  flex: 0 0 54%;
+  min-width: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 44px 52px;
+}
+
+.foot-pane {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 30px 36px;
+  overflow-y: auto;
+  background: var(--surface-raised);
+  border-inline-start: 1px solid var(--line);
+}
+
+.single {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 36px 48px;
+}
+
+/* Type */
+.k-heading {
+  margin: 0;
+  font-family: var(--font-display);
+  line-height: 1.28;
+  text-wrap: balance;
+}
+
+.k-h1 {
+  font-size: var(--k-h1);
+  font-weight: 700;
+  color: var(--primary-strong);
+}
+
+.k-h2 {
+  font-size: var(--k-h2);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.second {
+  display: block;
+  margin-block-start: 10px;
+  font-family: var(--font-body);
+  font-size: var(--k-second);
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.lede {
+  margin: 0;
+  max-width: 30em;
+}
+
+.note {
+  margin: 0;
+  font-size: var(--k-small);
+  color: var(--text-muted);
+}
+
+.count {
+  font-size: var(--k-small);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.pane-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+/* The second-language line keeps its own direction but lines up with the heading above it. */
+.kiosk[dir='rtl'] .second {
+  text-align: right;
+}
+
+.kiosk[dir='ltr'] .second {
+  text-align: left;
+}
+
+/* Buttons */
+.btn {
+  min-height: 84px;
+  padding-inline: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 0;
+  border-radius: var(--radius-md);
+  font-size: var(--k-button);
+  font-weight: 500;
+  transition: transform 120ms var(--ease-out), background-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+}
+
+.btn:active {
+  transform: translateY(2px);
+}
+
+.btn svg {
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.btn-primary:hover {
+  background: var(--primary-strong);
+}
+
+.btn-ghost {
+  background: var(--surface-raised);
+  color: var(--primary-strong);
+  box-shadow: inset 0 0 0 2px var(--line);
+}
+
+.btn-ghost:hover {
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.btn[aria-pressed='true'] {
+  background: var(--primary-strong);
+  color: var(--on-primary);
+  box-shadow: none;
+}
+
+.btn-small {
+  min-height: 60px;
+  padding-inline: 24px;
+  font-size: 21px;
+}
+
+.text-button {
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: var(--k-small);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+[dir='rtl'] .flip-rtl {
+  transform: scaleX(-1);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.push-end {
+  margin-block-start: auto;
+}
+
+.chip {
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.chip-yes {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* Narrow screens: the kiosk reflows into one column instead of shrinking past readability. */
+.stage.reflow .kiosk {
+  --k-h1: 30px;
+  --k-h2: 24px;
+  --k-second: 15px;
+  --k-body: 16px;
+  --k-small: 14px;
+  --k-button: 19px;
+  position: static;
+  width: auto;
+  height: auto;
+  transform: none;
+  border-radius: 16px;
+  box-shadow: 0 0 0 6px var(--primary-strong);
+}
+
+.stage.reflow .k-top {
+  height: auto;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 16px;
+}
+
+.stage.reflow .rail {
+  display: none;
+}
+
+.stage.reflow .k-body {
+  flex-direction: column;
+}
+
+.stage.reflow .guide,
+.stage.reflow .risk-band,
+.stage.reflow .foot-pane,
+.stage.reflow .single {
+  flex: none;
+  padding: 22px 18px;
+}
+
+.stage.reflow .foot-pane {
+  border-inline-start: 0;
+  border-block-start: 1px solid var(--line);
+}
+
+.stage.reflow .btn {
+  min-height: 60px;
+}

@@ -1,0 +1,45 @@
+/*
+ * Design tokens. Single light theme on purpose: the station is used outdoors in strong sun.
+ */
+:root {
+  --page: #e1e8e7;
+  --surface: #f2f5f4;
+  --surface-raised: #ffffff;
+  --line: #d3dddb;
+  --text: #13262a;
+  --text-muted: #4a5f63;
+  --primary: #1d5560;
+  --primary-strong: #143f48;
+  --on-primary: #ffffff;
+  --accent: #b08326;
+  --zone-base: #cbdcd9;
+
+  --success: #2e7148;
+  --success-tint: #e3f0e7;
+  --success-ink: #1f5435;
+  --warning: #e9a23b;
+  --warning-tint: #fbefd9;
+  --warning-ink: #6b4407;
+  --error: #a8261d;
+  --error-tint: #f8e1de;
+  --error-ink: #7e1a14;
+
+  --font-display: 'Alexandria', 'Readex Pro', 'Segoe UI', Tahoma, sans-serif;
+  --font-body: 'Readex Pro', 'Segoe UI', Tahoma, sans-serif;
+
+  /* Kiosk type scale, in screen pixels at 1280×800. */
+  --k-h1: 54px;
+  --k-h2: 34px;
+  --k-second: 21px;
+  --k-body: 23px;
+  --k-small: 18px;
+  --k-button: 28px;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color-scheme: light;
+}

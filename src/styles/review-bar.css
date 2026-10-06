@@ -1,0 +1,91 @@
+.review {
+  max-width: 1280px;
+  margin-inline: auto;
+  margin-block-end: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px 28px;
+}
+
+.review-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-inline-end: auto;
+  min-width: 0;
+}
+
+.review-title strong {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--primary-strong);
+}
+
+.review-title span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.control-group > span {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.segmented button {
+  border: 0;
+  background: transparent;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.segmented button:hover {
+  background: var(--surface);
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-low {
+  background: var(--success);
+}
+
+.dot-moderate {
+  background: var(--warning);
+}
+
+.dot-high {
+  background: var(--error);
+}
