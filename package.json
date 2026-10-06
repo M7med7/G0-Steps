@@ -1,0 +1,23 @@
+{
+  "name": "footguard-hajj",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Preventive foot-screening station for Hajj pilgrims: screening app prototype.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "qrcode": "^1.5.4"
+  }
+}

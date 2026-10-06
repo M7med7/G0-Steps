@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FootGuard Screening Station</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Alexandria:wght@600;700&family=Readex+Pro:wght@400;500;600&display=swap"
+    />
+  </head>
+  <body>
+    <header class="review" id="review-bar" aria-label="Prototype controls"></header>
+    <main>
+      <div class="stage" id="stage">
+        <div class="kiosk" id="kiosk" dir="rtl" lang="ar">
+          <div class="k-top" id="kiosk-top"></div>
+          <div class="k-body" id="kiosk-body"></div>
+        </div>
+      </div>
+      <div class="notes">
+        <section>
+          <h3>For the team to decide</h3>
+          <ul>
+            <li>Are these six questions the right ones, in the right order?</li>
+            <li>Should the pilgrim see the result screen, or only the volunteer?</li>
+            <li>What should the QR code carry, and who scans it?</li>
+            <li>Which risk rules do the medical members sign off on?</li>
+          </ul>
+        </section>
+        <section>
+          <h3>What is simulated</h3>
+          <ul>
+            <li>Pressure: 8 zones (4 per foot) from preset scenarios, not the ESP32 yet.</li>
+            <li>Thermal and camera scans: placeholders only.</li>
+            <li>Volunteer list: invented sample screenings, no real people.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>How the risk is decided</h3>
+          <p>
+            Illustrative rules, not clinically validated: an open wound, or diabetes with numbness, means
+            high risk and a referral. A zone at 80% or more of peak load, or a 30-point left/right gap in
+            the same zone, raises the risk to moderate. With diabetes, a high-load zone becomes high risk.
+          </p>
+        </section>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
