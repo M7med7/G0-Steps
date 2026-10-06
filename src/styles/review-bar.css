@@ -10,10 +10,23 @@
 
 .review-title {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: center;
+  gap: 12px;
   margin-inline-end: auto;
   min-width: 0;
+}
+
+.review-title > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.review-logo {
+  width: auto;
+  height: 36px;
+  flex: none;
 }
 
 .review-title strong {

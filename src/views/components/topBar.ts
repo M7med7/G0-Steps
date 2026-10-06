@@ -1,7 +1,8 @@
+import logoUrl from '../../assets/logo.webp';
 import { UI } from '../../i18n/copy';
 import type { ScreenName } from '../../models/types';
 import type { ViewContext } from '../context';
-import { ICONS, LOGO } from '../icons';
+import { ICONS } from '../icons';
 
 const STEPS = [UI.stepStart, UI.stepQuestions, UI.stepScan, UI.stepResult] as const;
 const STEP_OF: Readonly<Record<ScreenName, number>> = { start: 0, questions: 1, scan: 2, result: 3, volunteer: 3 };
@@ -18,7 +19,7 @@ function progressRail(ctx: ViewContext): string {
 }
 
 export function renderTopBar(ctx: ViewContext): string {
-  return `<div class="brand">${LOGO}<div><b>FootGuard · خطاك</b><small>${ctx.t(UI.brandSub)}</small></div></div>
+  return `<div class="brand"><img class="logo" src="${logoUrl}" alt="" width="45" height="48"><div><b>FootGuard · خطاك</b><small>${ctx.t(UI.brandSub)}</small></div></div>
     ${progressRail(ctx)}
     <span class="sim-badge">${ICONS.dot}${ctx.t(UI.simulated)} · ${ctx.tOther(UI.simulated)}</span>`;
 }

@@ -54,21 +54,9 @@
 }
 
 .logo {
-  width: 40px;
-  height: 44px;
+  width: auto;
+  height: 48px;
   flex: none;
-}
-
-.logo-shield {
-  fill: var(--primary);
-}
-
-.logo-print {
-  fill: var(--surface);
-}
-
-.logo-accent {
-  fill: var(--accent);
 }
 
 .rail {

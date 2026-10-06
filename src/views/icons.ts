@@ -15,13 +15,3 @@ export const RISK_ICONS: Readonly<Record<RiskLevel, string>> = {
   moderate: svg('<path d="M12 3.2L22 20.5H2L12 3.2z"/><path d="M12 9.5v5"/><circle cx="12" cy="17.4" r=".6" fill="currentColor"/>'),
   high: svg('<path d="M8.2 2.5h7.6l5.7 5.7v7.6l-5.7 5.7H8.2l-5.7-5.7V8.2z"/><path d="M12 7.5v6"/><circle cx="12" cy="16.6" r=".6" fill="currentColor"/>'),
 };
-
-/** Shield with a footprint: the team's mark, simplified for small sizes. */
-export const LOGO = `<svg viewBox="0 0 40 44" aria-hidden="true" class="logo">
-  <path d="M20 2l16 6v12c0 10-7 18-16 22C11 38 4 30 4 20V8l16-6z" class="logo-shield"/>
-  <ellipse cx="20" cy="29" rx="5" ry="6.5" class="logo-print"/>
-  <circle cx="14.5" cy="17" r="2.3" class="logo-print"/>
-  <circle cx="19.5" cy="14.6" r="2.6" class="logo-accent"/>
-  <circle cx="24.6" cy="16.4" r="2.1" class="logo-print"/>
-  <circle cx="27.6" cy="20" r="1.8" class="logo-print"/>
-</svg>`;

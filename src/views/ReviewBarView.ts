@@ -1,3 +1,4 @@
+import logoUrl from '../assets/logo.webp';
 import type { AppState } from '../models/ScreeningStore';
 import { SCENARIO_NAMES, SCREENS, type Language, type ScenarioName, type ScreenName } from '../models/types';
 
@@ -35,7 +36,7 @@ export class ReviewBarView {
     const scenarios = SCENARIO_NAMES.map((s) => ({ value: s, label: `<span class="dot dot-${s}"></span>${SCENARIO_LABELS[s]}` }));
     const languages = (['ar', 'en'] as const).map((l) => ({ value: l, label: LANGUAGE_LABELS[l] }));
 
-    this.root.innerHTML = `<div class="review-title"><strong>FootGuard Hajj · خطاك</strong><span>Screening station prototype for team review. All readings are simulated.</span></div>
+    this.root.innerHTML = `<div class="review-title"><img class="review-logo" src="${logoUrl}" alt="FootGuard Hajj logo" width="34" height="36"><div><strong>FootGuard Hajj · خطاك</strong><span>Screening station prototype for team review. All readings are simulated.</span></div></div>
       ${segmented('Screen', 'navigate', 'screen', screens, state.screen)}
       ${segmented('Scenario', 'set-scenario', 'scenario', scenarios, state.scenario)}
       ${segmented('Language', 'set-language', 'language', languages, state.language)}`;
