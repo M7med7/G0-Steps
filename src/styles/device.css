@@ -61,7 +61,7 @@ body.device-page {
   align-items: center;
   min-height: 44px;
   padding-inline: 16px;
-  border: 1px solid rgba(15, 58, 66, 0.2);
+  border: 1px solid var(--device-line);
   border-radius: 999px;
   background: var(--device-glass);
   color: var(--device-ink);
@@ -151,7 +151,7 @@ body.device-page {
 
 .d-leader {
   width: 64px;
-  border-top: 2px dashed rgba(255, 255, 255, 0.85);
+  border-top: 2px dashed var(--device-leader);
   position: relative;
 }
 
@@ -163,8 +163,8 @@ body.device-page {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(15, 58, 66, 0.25);
+  background: var(--device-dot);
+  box-shadow: 0 0 0 3px var(--device-line);
 }
 
 .d-label-part {
@@ -179,7 +179,7 @@ body.device-page {
   width: 0;
   height: 28px;
   border-top: 0;
-  border-inline-start: 2px dashed rgba(255, 255, 255, 0.9);
+  border-inline-start: 2px dashed var(--device-leader);
 }
 
 .d-label-part .d-leader::after {

@@ -1,6 +1,6 @@
 # FootGuard Hajj — Implementation Plan
 
-> Status: pre-pitch. Sprint 0 active; Sprint 1 prototype built. No fixed deadline. Last updated: 2026-10-06.
+> Status: pre-pitch. Sprint 0 active; Sprint 1 prototype built. No fixed deadline. Last updated: 2026-10-08.
 
 ## 1. Executive Summary
 
@@ -64,6 +64,12 @@ Decided in ADR-0001 (revised 2026-10-06 to plain MVC).
 - [x] Persistent "Simulated data / بيانات تجريبية" badge
 - [ ] Shareable build link for team review (deploy target to decide)
 - [ ] Team walkthrough; record decisions on questions, result audience and QR content
+
+### Station 3D view [built, in team review]
+- [x] `device.html`: interactive exploded view of the station's eight layers (ADR-0002)
+- [x] Select a layer or camera to animate the camera in; explode/assemble; ar/en
+- [ ] Mechatronics member confirms layer order, materials and parts
+- [ ] Replace the procedural model with a Blender model (`.glb`, layers named by id)
 
 ### Sprint 2 — Real pressure input [planned]
 - [ ] ESP32-S3 firmware: read 8 FSRs on ADC1, smooth, stream JSON

@@ -2,6 +2,7 @@
  * The station's physical layers, top to bottom, as shown in the team's exploded concept render.
  * Pure data and state transitions for the 3D device view. No DOM, no Three.js.
  */
+import type { Language } from './types';
 
 export type DeviceLayerId =
   | 'topGlass'
@@ -57,6 +58,13 @@ export interface DeviceSelection {
 
 /** null means the overview of the whole station. */
 export type DeviceFocus = DeviceSelection | null;
+
+/** Everything the 3D device page shows. Replaced, never mutated, on each change. */
+export interface DeviceViewState {
+  readonly language: Language;
+  readonly exploded: boolean;
+  readonly focus: DeviceFocus;
+}
 
 export function focusLayer(layer: DeviceLayerId): DeviceSelection {
   return { layer, part: null };

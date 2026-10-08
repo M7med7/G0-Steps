@@ -10,9 +10,10 @@ import {
   stepLayer,
   type DeviceLayerId,
   type DevicePartId,
+  type DeviceViewState,
 } from '../models/deviceLayers';
 import type { DeviceScene } from '../scene/DeviceScene';
-import { renderDevicePanel, renderDeviceTopBar, type DeviceViewState } from '../views/device/devicePanel';
+import { renderDevicePanel, renderDeviceTopBar } from '../views/device/devicePanel';
 
 /** A pointer that moves further than this between press and release is a drag, not a tap. */
 const TAP_SLOP_PX = 6;
@@ -43,11 +44,11 @@ export class DeviceController {
     doc.addEventListener('click', (event) => this.onClick(event));
     doc.addEventListener('keydown', (event) => this.onKey(event));
 
-    const canvas = this.el.stage;
-    canvas.addEventListener('pointerdown', (event) => (this.pressedAt = { x: event.clientX, y: event.clientY }));
-    canvas.addEventListener('pointerup', (event) => this.onTap(event));
-    canvas.addEventListener('pointermove', (event) => this.onHover(event));
-    canvas.addEventListener('pointerleave', () => this.scene.setHover(null));
+    const stage = this.el.stage;
+    stage.addEventListener('pointerdown', (event) => (this.pressedAt = { x: event.clientX, y: event.clientY }));
+    stage.addEventListener('pointerup', (event) => this.onTap(event));
+    stage.addEventListener('pointermove', (event) => this.onHover(event));
+    stage.addEventListener('pointerleave', () => this.scene.setHover(null));
 
     this.render();
     this.scene.setExploded(this.state.exploded);

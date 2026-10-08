@@ -1,6 +1,6 @@
 # FootGuard Hajj — Engineering Standards
 
-Scope: the Sprint 1 software prototype. It's vanilla TypeScript (strict) in an MVC structure, built with Vite, tested with Vitest, and client-only (see ADR-0001). Update this file when the stack or scope changes.
+Scope: the Sprint 1 software prototype. It's vanilla TypeScript (strict) in an MVC structure, built with Vite, tested with Vitest, and client-only (see ADR-0001). The 3D station view (`device.html`) adds Three.js (see ADR-0002). Update this file when the stack or scope changes.
 
 ## 1. Structure (MVC)
 

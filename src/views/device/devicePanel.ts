@@ -1,15 +1,8 @@
 import logoUrl from '../../assets/logo.webp';
 import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../../i18n/copy';
 import { translate, type Bilingual } from '../../i18n/translate';
-import { DEVICE_LAYERS, LAYER_PARTS, layerNumber, type DeviceFocus, type DeviceSelection } from '../../models/deviceLayers';
-import type { Language } from '../../models/types';
+import { DEVICE_LAYERS, LAYER_PARTS, layerNumber, type DeviceSelection, type DeviceViewState } from '../../models/deviceLayers';
 import { ICONS } from '../icons';
-
-export interface DeviceViewState {
-  readonly language: Language;
-  readonly exploded: boolean;
-  readonly focus: DeviceFocus;
-}
 
 type T = (text: Bilingual, vars?: Readonly<Record<string, string | number>>) => string;
 

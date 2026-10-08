@@ -19,6 +19,9 @@
   --device-bg-to: #5f8f96;
   --device-ink: #0f3a42;
   --device-glass: rgba(255, 255, 255, 0.72);
+  --device-line: rgba(15, 58, 66, 0.2);
+  --device-leader: rgba(255, 255, 255, 0.88);
+  --device-dot: #ffffff;
 
   --success: #2e7148;
   --success-tint: #e3f0e7;
