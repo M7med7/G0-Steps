@@ -5,9 +5,13 @@ import './styles/kiosk.css';
 import './styles/screens.css';
 
 import { AppController } from './controllers/AppController';
+import { browserCalibrationStorage } from './controllers/calibrationStorage';
 import { HashRouter } from './controllers/HashRouter';
-import { ScreeningStore } from './models/ScreeningStore';
+import { SCENARIOS } from './models/scenarios';
+import { createInitialState, ScreeningStore } from './models/ScreeningStore';
+import { FakeDevice } from './sensors/FakeDevice';
 import { SimulatedSource } from './sensors/SimulatedSource';
+import { WebSerialDevice } from './sensors/WebSerialDevice';
 import { KioskView } from './views/KioskView';
 import { ReviewBarView } from './views/ReviewBarView';
 
@@ -17,7 +21,8 @@ function requireElement(id: string): HTMLElement {
   return el;
 }
 
-const store = new ScreeningStore();
+const calibrationStorage = browserCalibrationStorage(() => window.localStorage);
+const store = new ScreeningStore(createInitialState('moderate', calibrationStorage.load() ?? undefined));
 const kioskView = new KioskView({
   stage: requireElement('stage'),
   kiosk: requireElement('kiosk'),
@@ -31,7 +36,15 @@ const controller = new AppController({
   kioskView,
   reviewBarView,
   router: new HashRouter(window.location, window.history),
-  createSensorSource: (scenario) => new SimulatedSource(scenario),
+  createPresetSource: (scenario) => new SimulatedSource(scenario),
+  // The fake pilgrim stands with the selected scenario's load, so switching scenario changes the stream.
+  createDevice: (mode) =>
+    mode === 'fakeDevice'
+      ? new FakeDevice(() => SCENARIOS[store.getState().scenario].pressure)
+      : navigator.serial
+        ? new WebSerialDevice(navigator.serial)
+        : null,
+  calibrationStorage,
   reduceMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
 });
 

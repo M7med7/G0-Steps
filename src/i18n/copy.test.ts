@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DEVICE_LAYERS, LAYER_PARTS } from '../models/deviceLayers';
 import { QUESTION_ORDER } from '../models/questions';
-import { RECOMMENDATION_PRIORITY } from '../models/rules';
+import { RECOMMENDATION_PRIORITY, RULES } from '../models/rules';
 import { ZONES } from '../models/types';
 import {
   DEVICE_LAYER_COPY,
@@ -12,6 +12,8 @@ import {
   QUESTIONS,
   RECOMMENDATIONS,
   RISK_LEVELS,
+  RULE_COPY,
+  SENSOR_ERRORS,
   UI,
   ZONE_NAMES,
 } from './copy';
@@ -30,7 +32,20 @@ function collectBilingual(value: unknown, path: string, out: [string, Bilingual]
 describe('copy', () => {
   const all: [string, Bilingual][] = [];
   collectBilingual(
-    { UI, QUESTIONS, ZONE_NAMES, FLAG_REASONS, RISK_LEVELS, RECOMMENDATIONS, PILGRIM_LANGUAGES, DEVICE_UI, DEVICE_LAYER_COPY, DEVICE_PART_COPY },
+    {
+      UI,
+      QUESTIONS,
+      ZONE_NAMES,
+      FLAG_REASONS,
+      RISK_LEVELS,
+      RECOMMENDATIONS,
+      PILGRIM_LANGUAGES,
+      DEVICE_UI,
+      DEVICE_LAYER_COPY,
+      DEVICE_PART_COPY,
+      SENSOR_ERRORS,
+      RULE_COPY,
+    },
     'copy',
     all,
   );
@@ -51,6 +66,7 @@ describe('copy', () => {
     QUESTION_ORDER.forEach((key) => expect(QUESTIONS[key]).toBeDefined());
     ZONES.forEach((zone) => expect(ZONE_NAMES[zone]).toBeDefined());
     RECOMMENDATION_PRIORITY.forEach((key) => expect(RECOMMENDATIONS[key]).toBeDefined());
+    RULES.forEach((rule) => expect(RULE_COPY[rule.id], rule.id).toBeDefined());
     DEVICE_LAYERS.forEach((layer) => {
       expect(DEVICE_LAYER_COPY[layer]).toBeDefined();
       LAYER_PARTS[layer].forEach((part) => expect(DEVICE_PART_COPY[part]).toBeDefined());

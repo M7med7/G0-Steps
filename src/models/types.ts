@@ -49,9 +49,21 @@ export interface RiskResult {
 
 export type ScenarioName = 'low' | 'moderate' | 'high';
 export type Language = 'ar' | 'en';
-export type ScreenName = 'start' | 'questions' | 'scan' | 'result' | 'volunteer';
+/** `result` is what the pilgrim sees; `doctor` is the clinician's summary of the same screening. */
+export type ScreenName = 'start' | 'questions' | 'scan' | 'result' | 'doctor' | 'volunteer';
 
-export const SCREENS: readonly ScreenName[] = ['start', 'questions', 'scan', 'result', 'volunteer'];
+export const SCREENS: readonly ScreenName[] = ['start', 'questions', 'scan', 'result', 'doctor', 'volunteer'];
+
+/**
+ * Where pressure comes from: preset scenarios, a fake ESP32 that streams the real serial protocol,
+ * or the real ESP32 over USB (Web Serial).
+ */
+export type SensorMode = 'preset' | 'fakeDevice' | 'esp32';
+export const SENSOR_MODES: readonly SensorMode[] = ['preset', 'fakeDevice', 'esp32'];
+export type DeviceStatus = 'disconnected' | 'connecting' | 'connected' | 'unsupported' | 'error';
+/** Why a scan produced no readings. */
+export type SensorErrorReason = 'readFailed' | 'noDevice' | 'noData' | 'noFeet';
+export type CalibrationStep = 'zero' | 'reference';
 export const SCENARIO_NAMES: readonly ScenarioName[] = ['low', 'moderate', 'high'];
 
 export const isScreenName = (value: unknown): value is ScreenName =>
@@ -59,3 +71,6 @@ export const isScreenName = (value: unknown): value is ScreenName =>
 export const isScenarioName = (value: unknown): value is ScenarioName =>
   typeof value === 'string' && (SCENARIO_NAMES as readonly string[]).includes(value);
 export const isLanguage = (value: unknown): value is Language => value === 'ar' || value === 'en';
+export const isSensorMode = (value: unknown): value is SensorMode =>
+  typeof value === 'string' && (SENSOR_MODES as readonly string[]).includes(value);
+export const isCalibrationStep = (value: unknown): value is CalibrationStep => value === 'zero' || value === 'reference';

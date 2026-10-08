@@ -124,6 +124,48 @@
   height: 12px;
 }
 
+/* Real ESP32 readings: the badge says live instead of simulated. */
+.live-badge {
+  background: var(--success-tint);
+  color: var(--success-ink);
+}
+
+.offline-badge {
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+/* Result tabs: what the pilgrim sees, and what the doctor sees. They replace the step rail on the result. */
+.view-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 auto;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.view-tabs button {
+  min-height: 44px;
+  padding: 6px 22px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 17px;
+  font-weight: 500;
+  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
+}
+
+.view-tabs button:hover {
+  color: var(--text);
+}
+
+.view-tabs button[aria-selected='true'] {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
 /* Panes */
 .k-body {
   flex: 1;
@@ -345,6 +387,15 @@
 
 .stage.reflow .rail {
   display: none;
+}
+
+.stage.reflow .view-tabs {
+  order: 3;
+  width: 100%;
+}
+
+.stage.reflow .view-tabs button {
+  flex: 1;
 }
 
 .stage.reflow .k-body {

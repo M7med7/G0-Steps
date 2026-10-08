@@ -1,6 +1,6 @@
 import type { DeviceLayerId, DevicePartId } from '../models/deviceLayers';
 import type { PilgrimLanguage } from '../models/screeningLog';
-import type { AnswerKey, FlagReason, RecommendationKey, RiskLevel, Zone } from '../models/types';
+import type { AnswerKey, FlagReason, RecommendationKey, RiskLevel, SensorErrorReason, Zone } from '../models/types';
 import type { Bilingual } from './translate';
 
 export const UI = {
@@ -76,7 +76,67 @@ export const UI = {
   rightFoot: { ar: 'القدم اليمنى', en: 'Right foot' },
   leftShort: { ar: 'يسار', en: 'Left' },
   rightShort: { ar: 'يمين', en: 'Right' },
+
+  liveSensors: { ar: 'مستشعرات حية', en: 'Live sensors' },
+  platformOffline: { ar: 'المنصة غير متصلة', en: 'Platform not connected' },
+  scanRecording: { ar: 'جارٍ التسجيل، ابقَ ثابتًا…', en: 'Recording, keep still…' },
+
+  viewTabs: { ar: 'طريقة عرض النتيجة', en: 'Result views' },
+  pilgrimView: { ar: 'ما يراه الحاج', en: 'Pilgrim view' },
+  doctorView: { ar: 'ما يراه الطبيب', en: 'Doctor view' },
+
+  doctorTitle: { ar: 'ملخص الفحص للطبيب', en: 'Screening summary' },
+  doctorLede: { ar: 'دعم قرار للفحص الوقائي، وليس تشخيصًا.', en: 'Decision support for preventive screening, not a diagnosis.' },
+  referralShort: { ar: 'يحتاج تحويلًا إلى النقطة الطبية', en: 'Refer to the medical point' },
+  noReferral: { ar: 'لا يحتاج تحويلًا', en: 'No referral needed' },
+  whyThisLevel: { ar: 'سبب مستوى الخطر', en: 'Why this risk level' },
+  illustrativeRule: { ar: 'توضيحية', en: 'illustrative' },
+  pilgrimAnswers: { ar: 'إجابات الحاج', en: "Pilgrim's answers" },
+  dataSources: { ar: 'مصادر البيانات', en: 'Data sources' },
+  sourcePreset: { ar: 'سيناريو جاهز · بيانات تجريبية', en: 'Preset scenario · simulated' },
+  sourceFake: { ar: 'جهاز ESP32 تجريبي · بيانات تجريبية', en: 'Fake ESP32 · simulated' },
+  sourceEsp32: { ar: 'منصة ESP32 · قراءة حية', en: 'ESP32 platform · live reading' },
+  capturedAt: { ar: 'وقت القراءة {time}', en: 'Captured {time}' },
+  zoneLoads: { ar: 'الحمل النسبي لكل منطقة', en: 'Relative load by zone' },
+  colZone: { ar: 'المنطقة', en: 'Zone' },
+  colGap: { ar: 'الفرق', en: 'Gap' },
+  loadNote: {
+    ar: 'نسبة من ضغطة المعايرة لكل مستشعر، وليست قياس ضغط بالكيلوباسكال.',
+    en: "Share of each sensor's calibration press, not a pressure measurement in kPa.",
+  },
 } as const satisfies Record<string, Bilingual>;
+
+/** What the scan screen says when a read fails, by reason. */
+export const SENSOR_ERRORS: Readonly<Record<SensorErrorReason, Bilingual>> = {
+  readFailed: UI.sensorError,
+  noDevice: {
+    ar: 'المنصة غير متصلة. اطلب من المرشد توصيلها ثم أعد المحاولة.',
+    en: "The platform isn't connected. Ask the volunteer to connect it, then try again.",
+  },
+  noData: {
+    ar: 'توقفت المنصة عن إرسال القراءات. تأكد من الكابل ثم أعد المحاولة.',
+    en: 'The platform stopped sending readings. Check the cable and try again.',
+  },
+  noFeet: {
+    ar: 'لم نرصد القدمين على المنصة. قف على العلامتين ثم أعد المحاولة.',
+    en: 'No feet detected on the platform. Stand on both outlines and try again.',
+  },
+};
+
+/** Plain-language names for the rules in models/rules.ts, shown in the doctor view. Keyed by rule id. */
+export const RULE_COPY: Readonly<Record<string, Bilingual>> = {
+  'open-wound': { ar: 'جرح مفتوح حاليًا', en: 'Open wound reported' },
+  'diabetes-with-numbness': { ar: 'سكري مع تنميل في القدم', en: 'Diabetes with numbness' },
+  'diabetes-with-high-load': { ar: 'سكري مع منطقة ضغط مرتفع جدًا', en: 'Diabetes with a high-pressure zone' },
+  diabetes: { ar: 'مصاب بالسكري', en: 'Has diabetes' },
+  'high-load-zone': { ar: 'منطقة ضغط مرتفع جدًا', en: 'High-pressure zone' },
+  'left-right-asymmetry': { ar: 'فرق في الضغط بين القدمين', en: 'Left/right pressure difference' },
+  'injury-history': {
+    ar: 'اثنان أو أكثر من: إصابة سابقة، ألم، حذاء غير معتاد',
+    en: 'Two or more of: past injury, pain, unusual footwear',
+  },
+  'baseline-care': { ar: 'إرشادات العناية الأساسية (حرارة الأرض)', en: 'Baseline care advice (hot ground)' },
+};
 
 export interface QuestionCopy {
   readonly question: Bilingual;

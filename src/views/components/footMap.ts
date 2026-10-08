@@ -3,7 +3,8 @@ import { zoneState } from '../../models/riskAssessment';
 import { FEET, ZONES, type Foot, type PressureMap, type Zone } from '../../models/types';
 import type { ViewContext } from '../context';
 
-export type FootMapMode = { kind: 'idle' } | { kind: 'scanning'; sensorsRead: number } | { kind: 'final' };
+/** `live` shows a connected device's latest frame on every zone at once. */
+export type FootMapMode = { kind: 'idle' } | { kind: 'scanning'; sensorsRead: number } | { kind: 'live' } | { kind: 'final' };
 
 type ZoneClass = 'z-idle' | 'z-pending' | 'z-normal' | 'z-elevated' | 'z-high';
 

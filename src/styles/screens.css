@@ -466,6 +466,215 @@ td.referred {
   color: var(--error-ink);
 }
 
+/* Doctor view: the same screening, with the reasons and numbers behind it. */
+.doctor {
+  gap: 14px;
+  padding-block: 32px;
+}
+
+.doctor .pane-title {
+  margin-block-start: 6px;
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+.doctor-level {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.doctor-level .level-pill {
+  font-size: 19px;
+  padding-block: 5px;
+}
+
+.chip-refer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--error-tint);
+  color: var(--error-ink);
+  font-weight: 500;
+}
+
+.chip-refer svg {
+  width: 16px;
+  height: 16px;
+}
+
+.rule-list,
+.answer-grid,
+.source-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 18px;
+}
+
+.rule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rule-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.level-dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.level-dot.level-low {
+  background: var(--success);
+}
+
+.level-dot.level-moderate {
+  background: var(--warning);
+}
+
+.level-dot.level-high {
+  background: var(--error);
+}
+
+.rule-tag {
+  font-size: 13px;
+  color: var(--text-muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 8px;
+}
+
+.answer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 18px;
+}
+
+.answer-grid li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+}
+
+.answer-grid li.is-yes {
+  border-color: var(--primary);
+}
+
+.answer-grid li.is-yes b {
+  color: var(--primary-strong);
+}
+
+.answer-grid b {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.source-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 16px;
+}
+
+.source-list li {
+  display: grid;
+  grid-template-columns: 20px auto 1fr;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+}
+
+.source-list li svg {
+  width: 18px;
+  height: 18px;
+}
+
+.source-list li.ok {
+  color: var(--text);
+}
+
+.source-list li.ok svg {
+  color: var(--success);
+}
+
+.source-list li span:last-child {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: end;
+}
+
+.doctor-pane {
+  gap: 6px;
+  padding-block: 18px;
+}
+
+.doctor-pane .note {
+  font-size: 14px;
+}
+
+.doctor-map {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.doctor-map .feet {
+  flex: 1;
+  min-width: 0;
+}
+
+.doctor-map .feet svg {
+  max-height: 190px;
+}
+
+.doctor-map .legend {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.zone-table {
+  font-size: 17px;
+}
+
+.zone-table th,
+.zone-table td {
+  padding: 7px 12px;
+}
+
+.zone-table tbody th {
+  position: static;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.zone-table tr.flagged th {
+  font-weight: 600;
+}
+
+.load-elevated {
+  color: var(--warning-ink);
+  font-weight: 600;
+}
+
+.load-high {
+  color: var(--error-ink);
+  font-weight: 700;
+}
+
 /* Reflowed (narrow) adjustments */
 .stage.reflow .feet svg {
   max-height: 300px;

@@ -6,6 +6,7 @@ import type { RiskResult } from '../models/types';
 import { renderTopBar } from './components/topBar';
 import { createViewContext, type ViewContext } from './context';
 import { renderQuestions } from './screens/questionsView';
+import { renderDoctor } from './screens/doctorView';
 import { qrPayload, renderResult } from './screens/resultView';
 import { renderScan } from './screens/scanView';
 import { renderStart } from './screens/startView';
@@ -52,6 +53,8 @@ export class KioskView {
       case 'result':
         // Until readings arrive the result screen shows the scan in progress.
         return result ? renderResult(ctx, result) : renderScan(ctx);
+      case 'doctor':
+        return result ? renderDoctor(ctx, result) : renderScan(ctx);
       case 'volunteer':
         return renderVolunteer(ctx, buildScreeningLog(result, ctx.language));
     }

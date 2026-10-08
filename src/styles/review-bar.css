@@ -120,3 +120,46 @@
 .dot-high {
   background: var(--error);
 }
+
+/* Platform connection and calibration, shown when a device source is picked. */
+.device-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-button {
+  min-height: 36px;
+  padding: 6px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.review-button:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+.review-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.review-status {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.review-status.status-connected {
+  color: var(--success-ink);
+  font-weight: 500;
+}
+
+.review-status.status-error,
+.review-status.status-unsupported {
+  color: var(--error-ink);
+}

@@ -1,7 +1,21 @@
+import { DEFAULT_CALIBRATION, type Calibration } from './pressureProtocol';
 import { QUESTION_COUNT, QUESTION_ORDER } from './questions';
 import { assessRisk } from './riskAssessment';
 import { scenarioAnswers } from './scenarios';
-import type { AnswerKey, Language, RiskAnswers, RiskResult, ScenarioName, ScreenName, SensorReadings } from './types';
+import type {
+  AnswerKey,
+  CalibrationStep,
+  DeviceStatus,
+  Language,
+  PressureMap,
+  RiskAnswers,
+  RiskResult,
+  ScenarioName,
+  ScreenName,
+  SensorErrorReason,
+  SensorMode,
+  SensorReadings,
+} from './types';
 
 export const SENSOR_COUNT = 8;
 
@@ -16,8 +30,17 @@ export interface AppState {
   /** Sensors read so far during the scan, 0–SENSOR_COUNT. */
   readonly scanProgress: number;
   readonly readings: SensorReadings | null;
-  /** True when the last sensor read failed; the scan screen offers a retry. */
-  readonly sensorError: boolean;
+  /** Set when the last sensor read failed; the scan screen explains why and offers a retry. */
+  readonly sensorError: SensorErrorReason | null;
+  readonly sensorMode: SensorMode;
+  readonly deviceStatus: DeviceStatus;
+  /** The latest calibrated frame from a connected device, shown live while scanning. */
+  readonly livePressure: PressureMap | null;
+  /** Calibration for the real ESP32. The fake device always uses the default. */
+  readonly calibration: Calibration;
+  readonly calibrating: CalibrationStep | null;
+  /** Sensors (by index in SENSOR_ORDER) that didn't respond during the last reference press. */
+  readonly weakSensors: readonly number[];
 }
 
 type Listener = (state: AppState) => void;
@@ -25,7 +48,7 @@ type Listener = (state: AppState) => void;
 const allAnswered = (): AppState['answered'] =>
   Object.fromEntries(QUESTION_ORDER.map((key) => [key, true])) as AppState['answered'];
 
-export function createInitialState(scenario: ScenarioName = 'moderate'): AppState {
+export function createInitialState(scenario: ScenarioName = 'moderate', calibration: Calibration = DEFAULT_CALIBRATION): AppState {
   return {
     screen: 'start',
     language: 'ar',
@@ -35,9 +58,21 @@ export function createInitialState(scenario: ScenarioName = 'moderate'): AppStat
     questionIndex: 0,
     scanProgress: 0,
     readings: null,
-    sensorError: false,
+    sensorError: null,
+    sensorMode: 'preset',
+    deviceStatus: 'disconnected',
+    livePressure: null,
+    calibration,
+    calibrating: null,
+    weakSensors: [],
   };
 }
+
+/** True while a device (real or fake) supplies the pressure instead of a preset. */
+export const usesDevice = (state: AppState): boolean => state.sensorMode !== 'preset';
+
+/** Anything on screen that isn't from the real board is simulated and must be labelled. The volunteer list is invented sample data. */
+export const showsSimulatedData = (state: AppState): boolean => state.sensorMode !== 'esp32' || state.screen === 'volunteer';
 
 export const isScanComplete = (state: AppState): boolean =>
   state.readings !== null && state.scanProgress >= SENSOR_COUNT;
@@ -79,7 +114,8 @@ export class ScreeningStore {
 
   goTo(screen: ScreenName): void {
     const resetQuestions: Partial<AppState> = screen === 'questions' ? { questionIndex: 0 } : {};
-    const freshScan: Partial<AppState> = screen === 'scan' ? { scanProgress: 0, readings: null, sensorError: false } : {};
+    const freshScan: Partial<AppState> =
+      screen === 'scan' ? { scanProgress: 0, readings: null, sensorError: null, livePressure: null } : {};
     this.update({ screen, ...resetQuestions, ...freshScan });
   }
 
@@ -126,11 +162,32 @@ export class ScreeningStore {
   }
 
   setReadings(readings: SensorReadings): void {
-    this.update({ readings, sensorError: false });
+    this.update({ readings, sensorError: null });
   }
 
-  setSensorError(): void {
-    this.update({ readings: null, scanProgress: 0, sensorError: true });
+  setSensorError(reason: SensorErrorReason): void {
+    this.update({ readings: null, scanProgress: 0, sensorError: reason });
+  }
+
+  /** Switching source discards any scan in progress; the controller connects or disconnects devices. */
+  setSensorMode(sensorMode: SensorMode): void {
+    this.update({ sensorMode, deviceStatus: 'disconnected', livePressure: null, readings: null, scanProgress: 0, sensorError: null });
+  }
+
+  setDeviceStatus(deviceStatus: DeviceStatus): void {
+    this.update(deviceStatus === 'connected' ? { deviceStatus } : { deviceStatus, livePressure: null, calibrating: null });
+  }
+
+  setLivePressure(livePressure: PressureMap): void {
+    this.update({ livePressure });
+  }
+
+  setCalibrating(calibrating: CalibrationStep | null): void {
+    this.update({ calibrating });
+  }
+
+  setCalibration(calibration: Calibration, weakSensors: readonly number[] = []): void {
+    this.update({ calibration, weakSensors, calibrating: null });
   }
 
   setScanProgress(progress: number): void {

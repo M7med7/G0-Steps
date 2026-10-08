@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { QUESTION_COUNT } from './questions';
 import { SCENARIOS } from './scenarios';
-import { createInitialState, ScreeningStore, selectResult, SENSOR_COUNT } from './ScreeningStore';
+import { DEFAULT_CALIBRATION } from './pressureProtocol';
+import { createInitialState, ScreeningStore, selectResult, SENSOR_COUNT, showsSimulatedData, usesDevice } from './ScreeningStore';
 import type { SensorReadings } from './types';
 
 const readings = (scenario: keyof typeof SCENARIOS): SensorReadings => ({
@@ -77,11 +78,56 @@ describe('ScreeningStore', () => {
   it('starts a fresh scan when navigating to the scan screen', () => {
     const store = new ScreeningStore();
     store.setReadings(readings('moderate'));
-    store.setSensorError();
+    store.setSensorError('noFeet');
     store.goTo('scan');
     const state = store.getState();
     expect(state.readings).toBeNull();
-    expect(state.sensorError).toBe(false);
+    expect(state.sensorError).toBeNull();
     expect(state.scanProgress).toBe(0);
+  });
+
+  it('switching sensor source drops any scan and device state', () => {
+    const store = new ScreeningStore();
+    store.setReadings(readings('moderate'));
+    store.setDeviceStatus('connected');
+    store.setLivePressure(SCENARIOS.low.pressure);
+    store.setSensorMode('esp32');
+    const state = store.getState();
+    expect(state.readings).toBeNull();
+    expect(state.deviceStatus).toBe('disconnected');
+    expect(state.livePressure).toBeNull();
+    expect(usesDevice(state)).toBe(true);
+  });
+
+  it('labels everything except the real board as simulated', () => {
+    const store = new ScreeningStore();
+    expect(showsSimulatedData(store.getState())).toBe(true);
+    store.setSensorMode('fakeDevice');
+    expect(showsSimulatedData(store.getState())).toBe(true);
+    store.setSensorMode('esp32');
+    expect(showsSimulatedData(store.getState())).toBe(false);
+    store.goTo('volunteer');
+    expect(showsSimulatedData(store.getState())).toBe(true);
+  });
+
+  it('clears live data and any calibration step when the device drops', () => {
+    const store = new ScreeningStore();
+    store.setDeviceStatus('connected');
+    store.setLivePressure(SCENARIOS.low.pressure);
+    store.setCalibrating('zero');
+    store.setDeviceStatus('error');
+    expect(store.getState().livePressure).toBeNull();
+    expect(store.getState().calibrating).toBeNull();
+  });
+
+  it('stores a new calibration with its weak sensors and ends the step', () => {
+    const store = new ScreeningStore();
+    store.setCalibrating('reference');
+    const calibration = { ...DEFAULT_CALIBRATION, referencedAt: '2026-10-09T08:00:00.000Z' };
+    store.setCalibration(calibration, [3]);
+    const state = store.getState();
+    expect(state.calibration).toBe(calibration);
+    expect(state.weakSensors).toEqual([3]);
+    expect(state.calibrating).toBeNull();
   });
 });
