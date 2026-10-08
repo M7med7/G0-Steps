@@ -2,7 +2,7 @@
 
 **Status:** Proposed (to confirm with the team)
 
-**Date:** 2026-10-08 (decision 3 revised 2026-10-09)
+**Date:** 2026-10-08 (decision 3 revised and decision 5 added 2026-10-09)
 
 **Authors:** Mohammed Alharbi
 
@@ -23,6 +23,11 @@ ADR-0001 set the stack as vanilla TypeScript in MVC with no UI framework. Browse
 3. **The model is built in Blender from a script.** `tools/blender/build_station.py` builds the station in Blender (bevelled edges, cut-outs, PCB and perforation textures) and exports one compressed file, `public/models/station.glb` (about 420 kB). Each layer is a root node named by its `DeviceLayerId`, and each camera module is a node named by its `DevicePartId`. `src/scene/stationModel.ts` loads it and turns it into the same layer objects as before. If the file can't be loaded or a name is missing, the page falls back to the procedural model in `src/scene/deviceModel.ts`. The file is served from our own origin, so there are still no network calls beyond Google Fonts. The model is illustrative, based on the render, and not to scale.
    The script is the source of truth: no `.blend` file is kept. To change the model, edit the script, rebuild and re-export (see the README).
 4. **MVC holds:** `models/deviceLayers.ts` has the layer list, the page state and the pure state transitions. `views/device/` renders the panel, and `scene/` is the 3D view. `DeviceController` handles all input.
+5. **Lighting aims at the Blender previews:**
+   - **Baked ambient occlusion.** The export step bakes contact shading in Cycles, one layer at a time with the others hidden, so it stays right when the layers pull apart. Each layer gets one 1024 px AO texture, stored in the `.glb` as the standard occlusion map.
+   - **Studio reflections.** `public/env/studio.exr` is the CC0 "studio_small_01" image (Greg Zaal, Poly Haven) that ships with Blender and lights the previews, about 100 kB. If it fails to load, the scene uses three.js's built-in RoomEnvironment.
+   - **PBR Neutral tone mapping.** We tried AgX to match Blender, but on the web it dulled the PCB and greyed the white shell. Neutral keeps them true.
+   - We left out real-time shadows and screen-space AO for now, to protect frame rate on phones.
 
 ---
 
@@ -34,7 +39,8 @@ ADR-0001 set the stack as vanilla TypeScript in MVC with no UI framework. Browse
 - Because the model is a script, changes are reviewable diffs and the model can be rebuilt in seconds.
 
 ### Negative
-- About 185 kB (gzipped) of extra JavaScript plus the 420 kB model, loaded only on `device.html`.
+- About 200 kB (gzipped) of extra JavaScript, plus the 1 MB model and the 100 kB studio image, loaded only on `device.html`.
+- Baked AO is fixed per layer, so it can't react to the camera or to neighbouring layers. Layers don't shade each other when assembled.
 - Rebuilding the model needs Blender 5.2 on the machine, and compressing it needs `npx @gltf-transform/cli@4`. The site itself doesn't.
 - OrbitControls listens to pointer input itself, so the 3D view is the one view that handles input. Taps that change state still go through `DeviceController`.
 - The surface colours of the 3D parts are constants in `deviceModel.ts`, not `tokens.css` tokens, because WebGL materials can't read CSS variables.

@@ -26,7 +26,7 @@ npx @gltf-transform/cli@4 webp /tmp/station/station-raw.glb /tmp/station/station
 npx @gltf-transform/cli@4 meshopt /tmp/station/station-webp.glb public/models/station.glb
 ```
 
-`--render` also writes preview images to `/tmp/station`. Keep the layer names in the script the same as the ids in `src/models/deviceLayers.ts`; the page checks them and falls back to the built-in model if one is missing.
+`--export` also bakes each layer's ambient occlusion in Cycles (about 30 seconds on a recent Mac), and `--render` writes preview images to `/tmp/station`. Reflections on the page come from `public/env/studio.exr`, the CC0 "studio_small_01" image by Greg Zaal (Poly Haven) that ships with Blender. Keep the layer names in the script the same as the ids in `src/models/deviceLayers.ts`; the page checks them and falls back to the built-in model if one is missing.
 
 ```bash
 npm test           # rule engine, store, sensor and copy tests

@@ -18,6 +18,13 @@ const FADED_ALPHA = 0.1;
 const FOCUS_DIRECTION = new THREE.Vector3(0.38, 0.95, 1).normalize();
 const OVERVIEW_DIRECTION = new THREE.Vector3(0.5, 0.42, 1).normalize();
 const HOVER_EMISSIVE = new THREE.Color(0xb08326);
+/** Lighting tuned towards the Blender previews: PBR Neutral colour (keeps the PCB and whites true), the studio image for reflections, one key light. */
+const EXPOSURE = 1.0;
+const ENVIRONMENT_INTENSITY = 1.5;
+/** Turns the studio image so its bright panels reflect in the metal parts from the usual viewing angles. */
+const ENVIRONMENT_ROTATION_Y = Math.PI * 0.5;
+const KEY_INTENSITY = 1.6;
+const FILL_INTENSITY = 0.25;
 
 export interface LabelText {
   readonly layers: Readonly<Record<DeviceLayerId, string>>;
@@ -66,11 +73,13 @@ export class DeviceScene {
     private readonly reduceMotion: boolean,
     /** From the Blender model (stationModel.ts) or the procedural fallback (deviceModel.ts). */
     private readonly layers: Map<DeviceLayerId, LayerObject>,
+    /** The studio image (studioEnvironment.ts), or null to use the built-in room lighting. */
+    environment: THREE.Texture | null,
   ) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.toneMapping = THREE.NeutralToneMapping;
+    this.renderer.toneMappingExposure = EXPOSURE;
     this.renderer.domElement.classList.add('d-canvas');
     host.append(this.renderer.domElement);
 
@@ -78,12 +87,17 @@ export class DeviceScene {
     host.append(this.labelRenderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    this.scene.environment = environment
+      ? pmrem.fromEquirectangular(environment).texture
+      : pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    environment?.dispose();
     pmrem.dispose();
+    this.scene.environmentIntensity = ENVIRONMENT_INTENSITY;
+    this.scene.environmentRotation.y = ENVIRONMENT_ROTATION_Y;
 
-    const key = new THREE.DirectionalLight(0xffffff, 1.4);
-    key.position.set(4, 10, 6);
-    this.scene.add(key, new THREE.HemisphereLight(0xffffff, 0x5d8f95, 0.6));
+    const key = new THREE.DirectionalLight(0xffffff, KEY_INTENSITY);
+    key.position.set(-6, 10, 7);
+    this.scene.add(key, new THREE.HemisphereLight(0xffffff, 0x5d8f95, FILL_INTENSITY));
 
     for (const layer of this.layers.values()) {
       this.scene.add(layer.group);

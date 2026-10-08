@@ -70,6 +70,8 @@ Decided in ADR-0001 (revised 2026-10-06 to plain MVC).
 - [x] Select a layer or camera to animate the camera in; explode/assemble; ar/en
 - [ ] Mechatronics member confirms layer order, materials and parts
 - [x] Replace the procedural model with a Blender model (`.glb`, layers named by id); procedural model kept as fallback
+- [x] Realistic lighting: baked AO per layer, studio reflections, PBR Neutral tone mapping (ADR-0002 decision 5)
+- [ ] Check frame rate on a real phone; decide on real-time shadows / screen-space AO
 
 ### Sprint 2 — Real pressure input [planned]
 - [ ] ESP32-S3 firmware: read 8 FSRs on ADC1, smooth, stream JSON

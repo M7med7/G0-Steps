@@ -59,6 +59,16 @@ describe('layersFromModel', () => {
     expect(new Set(all).size).toBe(all.length);
   });
 
+  it('keeps the baked occlusion map on each material copy', () => {
+    const root = fakeModel();
+    const ao = new THREE.Texture();
+    const mesh = root.getObjectByName('circuit')?.children[0];
+    if (!(mesh instanceof THREE.Mesh)) throw new Error('fake model has no circuit mesh');
+    mesh.material = new THREE.MeshStandardMaterial({ aoMap: ao });
+    const material = layersFromModel(root).get('circuit')?.materials[0];
+    expect(material?.aoMap).toBe(ao);
+  });
+
   it('draws transparent textured surfaces after the glass', () => {
     const root = fakeModel();
     const glass = root.getObjectByName('topGlass');

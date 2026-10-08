@@ -8,6 +8,7 @@ import { DeviceController } from './controllers/DeviceController';
 import { DeviceScene } from './scene/DeviceScene';
 import { buildDevice } from './scene/deviceModel';
 import { loadStationModel } from './scene/stationModel';
+import { loadStudioEnvironment } from './scene/studioEnvironment';
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -36,14 +37,21 @@ async function start(): Promise<void> {
   loading.textContent = translate(DEVICE_UI.loading, language);
   stage.append(loading);
   // The Blender model, or the procedural one if the file can't be loaded or is missing a layer.
-  const layers = await loadStationModel().catch((error: unknown) => {
-    console.warn('Station model not loaded, using the built-in model instead.', error);
-    return buildDevice();
-  });
+  // The studio lighting image loads alongside it; without it the scene uses its built-in room lighting.
+  const [layers, environment] = await Promise.all([
+    loadStationModel().catch((error: unknown) => {
+      console.warn('Station model not loaded, using the built-in model instead.', error);
+      return buildDevice();
+    }),
+    loadStudioEnvironment().catch((error: unknown) => {
+      console.warn('Studio lighting not loaded, using the built-in lighting instead.', error);
+      return null;
+    }),
+  ]);
   loading.remove();
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const scene = new DeviceScene(requireElement('device-canvas'), reduceMotion, layers);
+  const scene = new DeviceScene(requireElement('device-canvas'), reduceMotion, layers, environment);
   const controller = new DeviceController(
     scene,
     {
