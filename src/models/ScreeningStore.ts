@@ -41,6 +41,8 @@ export interface AppState {
   readonly calibrating: CalibrationStep | null;
   /** Sensors (by index in SENSOR_ORDER) that didn't respond during the last reference press. */
   readonly weakSensors: readonly number[];
+  /** The team's demo drawer (scenarios, sensor source, calibration). Closed by default so the app looks like the product. */
+  readonly demoOpen: boolean;
 }
 
 type Listener = (state: AppState) => void;
@@ -65,6 +67,7 @@ export function createInitialState(scenario: ScenarioName = 'moderate', calibrat
     calibration,
     calibrating: null,
     weakSensors: [],
+    demoOpen: false,
   };
 }
 
@@ -117,6 +120,10 @@ export class ScreeningStore {
     const freshScan: Partial<AppState> =
       screen === 'scan' ? { scanProgress: 0, readings: null, sensorError: null, livePressure: null } : {};
     this.update({ screen, ...resetQuestions, ...freshScan });
+  }
+
+  setDemoOpen(demoOpen: boolean): void {
+    this.update({ demoOpen });
   }
 
   setLanguage(language: Language): void {

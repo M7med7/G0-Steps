@@ -99,6 +99,13 @@ describe('ScreeningStore', () => {
     expect(usesDevice(state)).toBe(true);
   });
 
+  it('opens and closes the demo drawer, closed at start', () => {
+    const store = new ScreeningStore();
+    expect(store.getState().demoOpen).toBe(false);
+    store.setDemoOpen(true);
+    expect(store.getState().demoOpen).toBe(true);
+  });
+
   it('labels everything except the real board as simulated', () => {
     const store = new ScreeningStore();
     expect(showsSimulatedData(store.getState())).toBe(true);

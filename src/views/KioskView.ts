@@ -2,9 +2,10 @@ import * as QRCode from 'qrcode';
 import { directionOf } from '../i18n/translate';
 import { selectResult, type AppState } from '../models/ScreeningStore';
 import { buildScreeningLog } from '../models/screeningLog';
-import type { RiskResult } from '../models/types';
+import type { RiskResult, ScreenName } from '../models/types';
 import { renderTopBar } from './components/topBar';
 import { createViewContext, type ViewContext } from './context';
+import { morphChildren } from './morph';
 import { renderQuestions } from './screens/questionsView';
 import { renderDoctor } from './screens/doctorView';
 import { qrPayload, renderResult } from './screens/resultView';
@@ -16,6 +17,8 @@ const DESIGN_WIDTH = 1280;
 const DESIGN_HEIGHT = 800;
 /** Below this available width the kiosk reflows into one column instead of shrinking. */
 const REFLOW_BELOW = 760;
+/** The 1280×800 design scales up to fill bigger screens, but not past this (text stays crisp; it's vector). */
+const MAX_SCALE = 2;
 
 export interface KioskElements {
   readonly stage: HTMLElement;
@@ -26,6 +29,8 @@ export interface KioskElements {
 
 /** Renders the kiosk screen from state. Knows nothing about events; buttons carry data-action attributes. */
 export class KioskView {
+  private shownScreen: ScreenName | null = null;
+
   constructor(private readonly el: KioskElements) {}
 
   render(state: AppState): void {
@@ -35,8 +40,13 @@ export class KioskView {
     this.el.kiosk.setAttribute('lang', state.language);
     this.el.kiosk.setAttribute('dir', directionOf(state.language));
     this.el.kiosk.dataset['screen'] = state.screen;
-    this.el.top.innerHTML = renderTopBar(ctx);
-    this.el.body.innerHTML = this.renderScreen(ctx, result);
+    morphChildren(this.el.top, renderTopBar(ctx));
+    // A new screen is drawn fresh so its enter animation plays; updates within a screen only patch what changed,
+    // which keeps the scan animations running instead of restarting on every progress tick.
+    const body = this.renderScreen(ctx, result);
+    if (state.screen !== this.shownScreen) this.el.body.innerHTML = body;
+    else morphChildren(this.el.body, body);
+    this.shownScreen = state.screen;
 
     if (state.screen === 'result' && result) void this.drawQr(result);
     this.fit();
@@ -71,18 +81,20 @@ export class KioskView {
     }
   }
 
-  /** Scales the 1280×800 design to the available width, or switches to the reflowed layout. */
+  /** Scales the 1280×800 design to fill the window, centred, or switches to the reflowed layout on narrow screens. */
   fit(): void {
-    const width = this.el.stage.clientWidth;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
     const reflow = width < REFLOW_BELOW;
     this.el.stage.classList.toggle('reflow', reflow);
+    document.documentElement.classList.toggle('kiosk-fullscreen', !reflow);
     if (reflow) {
       this.el.kiosk.style.transform = '';
-      this.el.stage.style.height = '';
       return;
     }
-    const scale = Math.min(1, width / DESIGN_WIDTH);
-    this.el.kiosk.style.transform = `scale(${scale})`;
-    this.el.stage.style.height = `${DESIGN_HEIGHT * scale}px`;
+    const scale = Math.min(MAX_SCALE, width / DESIGN_WIDTH, height / DESIGN_HEIGHT);
+    const x = (width - DESIGN_WIDTH * scale) / 2;
+    const y = (height - DESIGN_HEIGHT * scale) / 2;
+    this.el.kiosk.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
   }
 }

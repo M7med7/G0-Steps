@@ -6,7 +6,7 @@
 
 html,
 body {
-  background: var(--page);
+  background: var(--app);
   color: var(--text);
 }
 
@@ -15,8 +15,7 @@ body {
   font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.5;
-  padding-inline: 16px;
-  padding-block: 16px 48px;
+  -webkit-font-smoothing: antialiased;
 }
 
 button {
@@ -30,38 +29,25 @@ button {
   outline-offset: 3px;
 }
 
-/* Notes for reviewers, below the kiosk */
-.notes {
-  max-width: 1280px;
-  margin: 28px auto 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+/* Shared motion. Every animation in the app is switched off for people who ask for less motion. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
 }
 
-.notes section {
-  min-width: 0;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
-.notes h3 {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 8px;
-  color: var(--primary-strong);
-}
-
-.notes ul {
-  margin: 0;
-  padding-inline-start: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.notes p {
-  margin: 0;
-  color: var(--text-muted);
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

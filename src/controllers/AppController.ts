@@ -14,7 +14,7 @@ import { CAPTURE_MS, DeviceSource } from '../sensors/DeviceSource';
 import type { PressureDevice } from '../sensors/PressureDevice';
 import { SensorReadError, type SensorSource } from '../sensors/SensorSource';
 import type { KioskView } from '../views/KioskView';
-import type { ReviewBarView } from '../views/ReviewBarView';
+import type { DemoPanelView } from '../views/DemoPanelView';
 import type { CalibrationStorage } from './calibrationStorage';
 import type { HashRouter } from './HashRouter';
 
@@ -30,7 +30,7 @@ const REFERENCE_CAPTURE_MS = 12000;
 export interface AppControllerDeps {
   readonly store: ScreeningStore;
   readonly kioskView: KioskView;
-  readonly reviewBarView: ReviewBarView;
+  readonly demoPanelView: DemoPanelView;
   readonly router: HashRouter;
   readonly createPresetSource: (scenario: ScenarioName) => SensorSource;
   /** Returns null when this browser can't reach the device (no Web Serial). */
@@ -64,6 +64,9 @@ export class AppController {
     const { store, router } = this.deps;
     store.subscribe((state) => this.onStateChange(state));
     root.addEventListener('click', (event) => this.onClick(event));
+    root.addEventListener('keydown', (event) => {
+      if (event instanceof KeyboardEvent && event.key === 'Escape' && store.getState().demoOpen) store.setDemoOpen(false);
+    });
     win.addEventListener('resize', () => this.deps.kioskView.fit());
     win.addEventListener('hashchange', () => {
       const screen = router.read();
@@ -82,7 +85,7 @@ export class AppController {
 
   private onStateChange(state: AppState): void {
     this.deps.kioskView.render(state);
-    this.deps.reviewBarView.render(state);
+    this.deps.demoPanelView.render(state);
     this.deps.router.write(state.screen);
     this.syncScan(state);
   }
@@ -327,6 +330,12 @@ export class AppController {
         break;
       case 'calibrate':
         if (isCalibrationStep(step)) void this.calibrate(step);
+        break;
+      case 'toggle-demo':
+        store.setDemoOpen(!store.getState().demoOpen);
+        break;
+      case 'close-demo':
+        store.setDemoOpen(false);
         break;
     }
   }

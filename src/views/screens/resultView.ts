@@ -19,10 +19,10 @@ export function renderResult(ctx: ViewContext, result: RiskResult): string {
     ? `<div class="referral" role="alert">${RISK_ICONS.high}<div><b>${ctx.t(UI.referral)}</b><span>${ctx.tOther(UI.referral)}</span></div></div>`
     : '';
   const recommendations = result.recommendations
-    .map((key) => `<li>${ICONS.check}<span>${ctx.t(RECOMMENDATIONS[key])}</span></li>`)
+    .map((key, i) => `<li style="--i:${i}">${ICONS.check}<span>${ctx.t(RECOMMENDATIONS[key])}</span></li>`)
     .join('');
 
-  return `<section class="risk-band risk-${result.level}">
+  return `<section class="risk-band risk-${result.level}" data-key="result-${result.level}">
       <div class="verdict">${RISK_ICONS[result.level]}${bilingualHeading(ctx, level.title)}</div>
       <p class="lede">${ctx.t(level.summary)}</p>
       ${referral}

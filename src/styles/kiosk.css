@@ -1,36 +1,44 @@
-/* The 1280×800 kiosk frame, its top bar, panes, and shared controls. */
+/* The kiosk: a 1280×800 design that KioskView.fit() scales to fill the window, plus its top bar, sheets and controls. */
+html.kiosk-fullscreen,
+html.kiosk-fullscreen body {
+  height: 100%;
+  overflow: hidden;
+}
+
 .stage {
-  max-width: 1280px;
-  margin-inline: auto;
   position: relative;
+  min-height: 100dvh;
+  background:
+    radial-gradient(900px 520px at 88% -8%, rgb(29 85 96 / 9%), transparent 62%),
+    radial-gradient(700px 480px at 4% 108%, rgb(176 131 38 / 6%), transparent 60%),
+    var(--app);
 }
 
 .kiosk {
   position: absolute;
-  inset-inline-start: 0;
   top: 0;
+  left: 0;
   width: 1280px;
   height: 800px;
-  transform-origin: top left;
+  transform-origin: 0 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 0 0 10px var(--primary-strong), 0 18px 40px -12px rgb(19 38 42 / 45%);
+  gap: 14px;
+  padding: 16px;
   font-size: var(--k-body);
 }
 
-/* Top bar */
+/* Top bar: a floating sheet with the brand, the step rail (or the result tabs) and the data-source badge. */
 .k-top {
-  height: 84px;
+  height: 72px;
   flex: none;
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding-inline: 36px;
+  gap: 20px;
+  padding-inline: 18px 16px;
   background: var(--surface-raised);
-  border-block-end: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sheet);
 }
 
 .brand {
@@ -41,7 +49,7 @@
 
 .brand b {
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 23px;
   color: var(--primary-strong);
   white-space: nowrap;
 }
@@ -55,13 +63,14 @@
 
 .logo {
   width: auto;
-  height: 48px;
+  height: 44px;
   flex: none;
 }
 
+/* Step rail: numbered steps joined by a line that fills in as the pilgrim moves on. */
 .rail {
   display: flex;
-  gap: 6px;
+  align-items: center;
   margin: 0 auto;
   padding: 0;
   list-style: none;
@@ -71,15 +80,31 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 17px;
+  font-size: 16px;
   color: var(--text-muted);
+  transition: background-color var(--dur-medium) var(--ease-out), color var(--dur-medium) var(--ease-out);
+}
+
+.rail li + li::before {
+  content: '';
+  width: 26px;
+  height: 2px;
+  margin-inline-end: 6px;
+  border-radius: 2px;
+  background: var(--line);
+  transition: background-color var(--dur-medium) var(--ease-out);
+}
+
+.rail li.done::before,
+.rail li.now::before {
+  background: var(--primary);
 }
 
 .rail li i {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   border: 2px solid var(--line);
@@ -87,6 +112,8 @@
   font-size: 14px;
   font-style: normal;
   font-weight: 600;
+  transition: background-color var(--dur-medium) var(--ease-out), border-color var(--dur-medium) var(--ease-out),
+    color var(--dur-medium) var(--ease-out);
 }
 
 .rail li.done i {
@@ -104,14 +131,16 @@
 .rail li.now i {
   border-color: var(--primary);
   color: var(--primary);
+  box-shadow: 0 0 0 4px rgb(29 85 96 / 12%);
 }
 
+/* Data-source badge: simulated (amber), live (green) or platform not connected (grey). It can't be hidden. */
 .sim-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
   background: var(--warning-tint);
   color: var(--warning-ink);
   font-size: 15px;
@@ -120,14 +149,23 @@
 }
 
 .sim-badge .icon-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
-/* Real ESP32 readings: the badge says live instead of simulated. */
 .live-badge {
   background: var(--success-tint);
   color: var(--success-ink);
+}
+
+.live-badge .icon-dot {
+  animation: live-blink 1.6s var(--ease-in-out) infinite;
+}
+
+@keyframes live-blink {
+  50% {
+    opacity: 0.35;
+  }
 }
 
 .offline-badge {
@@ -146,15 +184,16 @@
 }
 
 .view-tabs button {
-  min-height: 44px;
-  padding: 6px 22px;
+  min-height: 46px;
+  padding: 6px 24px;
   border: 0;
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
   font-size: 17px;
   font-weight: 500;
-  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out);
 }
 
 .view-tabs button:hover {
@@ -164,24 +203,37 @@
 .view-tabs button[aria-selected='true'] {
   background: var(--primary);
   color: var(--on-primary);
+  box-shadow: var(--shadow-primary);
 }
 
-/* Panes */
+/* Body: two sheets side by side. Each new screen rises in; the second sheet follows a beat later. */
 .k-body {
   flex: 1;
   display: flex;
+  gap: 14px;
   min-height: 0;
+}
+
+.k-body > * {
+  animation: rise-in 560ms var(--ease-out) both;
+}
+
+.k-body > * + * {
+  animation-delay: 90ms;
 }
 
 .guide,
 .risk-band {
-  flex: 0 0 54%;
+  flex: 0 0 53%;
   min-width: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 22px;
-  padding: 44px 52px;
+  padding: 40px 44px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sheet);
 }
 
 .foot-pane {
@@ -190,10 +242,11 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 30px 36px;
+  padding: 28px 32px;
   overflow-y: auto;
   background: var(--surface-raised);
-  border-inline-start: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sheet);
 }
 
 .single {
@@ -202,14 +255,17 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 36px 48px;
+  padding: 36px 44px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sheet);
 }
 
 /* Type */
 .k-heading {
   margin: 0;
   font-family: var(--font-display);
-  line-height: 1.28;
+  line-height: 1.25;
   text-wrap: balance;
 }
 
@@ -255,7 +311,7 @@
 .pane-title {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 600;
 }
 
@@ -280,7 +336,12 @@
   border-radius: var(--radius-md);
   font-size: var(--k-button);
   font-weight: 500;
-  transition: transform 120ms var(--ease-out), background-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+  transition: transform var(--dur-micro) var(--ease-out), background-color var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
 }
 
 .btn:active {
@@ -291,15 +352,26 @@
   width: 30px;
   height: 30px;
   flex: none;
+  transition: translate var(--dur-short) var(--ease-out);
 }
 
 .btn-primary {
   background: var(--primary);
   color: var(--on-primary);
+  box-shadow: var(--shadow-primary);
 }
 
 .btn-primary:hover {
   background: var(--primary-strong);
+}
+
+/* The main call to action nudges its arrow forward on hover, in the reading direction. */
+.kiosk[dir='ltr'] .btn-cta:hover svg {
+  translate: 4px 0;
+}
+
+.kiosk[dir='rtl'] .btn-cta:hover svg {
+  translate: -4px 0;
 }
 
 .btn-ghost {
@@ -319,19 +391,22 @@
 }
 
 .btn-small {
-  min-height: 60px;
-  padding-inline: 24px;
-  font-size: 21px;
+  min-height: 56px;
+  padding-inline: 22px;
+  font-size: 20px;
 }
 
 .text-button {
-  padding: 8px 0;
+  align-self: flex-start;
+  min-height: 48px;
+  padding: 8px 2px;
   border: 0;
   background: none;
   color: var(--primary);
   font-size: var(--k-small);
+  font-weight: 500;
   text-decoration: underline;
-  text-underline-offset: 4px;
+  text-underline-offset: 5px;
 }
 
 [dir='rtl'] .flip-rtl {
@@ -360,9 +435,10 @@
 .chip-yes {
   background: var(--primary);
   color: var(--on-primary);
+  animation: pop-in var(--dur-medium) var(--ease-spring) both;
 }
 
-/* Narrow screens: the kiosk reflows into one column instead of shrinking past readability. */
+/* Narrow screens: the kiosk reflows into one scrolling column instead of shrinking past readability. */
 .stage.reflow .kiosk {
   --k-h1: 30px;
   --k-h2: 24px;
@@ -374,15 +450,14 @@
   width: auto;
   height: auto;
   transform: none;
-  border-radius: 16px;
-  box-shadow: 0 0 0 6px var(--primary-strong);
+  padding: 10px;
 }
 
 .stage.reflow .k-top {
   height: auto;
   flex-wrap: wrap;
   gap: 10px;
-  padding: 12px 16px;
+  padding: 10px 14px;
 }
 
 .stage.reflow .rail {
@@ -408,11 +483,7 @@
 .stage.reflow .single {
   flex: none;
   padding: 22px 18px;
-}
-
-.stage.reflow .foot-pane {
-  border-inline-start: 0;
-  border-block-start: 1px solid var(--line);
+  border-radius: var(--radius-lg);
 }
 
 .stage.reflow .btn {

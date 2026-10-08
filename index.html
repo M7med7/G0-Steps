@@ -2,8 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#eef3f2" />
     <title>FootGuard Screening Station</title>
+    <meta name="description" content="FootGuard Hajj: a preventive foot-screening station for pilgrims." />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,43 +16,13 @@
     />
   </head>
   <body>
-    <header class="review" id="review-bar" aria-label="Prototype controls"></header>
-    <main>
-      <div class="stage" id="stage">
-        <div class="kiosk" id="kiosk" dir="rtl" lang="ar">
-          <div class="k-top" id="kiosk-top"></div>
-          <div class="k-body" id="kiosk-body"></div>
-        </div>
-      </div>
-      <div class="notes">
-        <section>
-          <h3>For the team to decide</h3>
-          <ul>
-            <li>Are these six questions the right ones, in the right order?</li>
-            <li>Should the pilgrim see the result screen, or only the volunteer?</li>
-            <li>Does the doctor view show what a clinician needs, and nothing that reads as a diagnosis?</li>
-            <li>What should the QR code carry, and who scans it?</li>
-            <li>Which risk rules do the medical members sign off on?</li>
-          </ul>
-        </section>
-        <section>
-          <h3>What is simulated</h3>
-          <ul>
-            <li>Pressure: 8 zones (4 per foot). Simulated with the Preset or Fake ESP32 source; real with ESP32 (USB) once the board is wired.</li>
-            <li>Thermal and camera scans: placeholders only.</li>
-            <li>Volunteer list: invented sample screenings, no real people.</li>
-          </ul>
-        </section>
-        <section>
-          <h3>How the risk is decided</h3>
-          <p>
-            Illustrative rules, not clinically validated: an open wound, or diabetes with numbness, means
-            high risk and a referral. A zone at 80% or more of peak load, or a 30-point left/right gap in
-            the same zone, raises the risk to moderate. With diabetes, a high-load zone becomes high risk.
-          </p>
-        </section>
+    <main class="stage" id="stage">
+      <div class="kiosk" id="kiosk" dir="rtl" lang="ar">
+        <div class="k-top" id="kiosk-top"></div>
+        <div class="k-body" id="kiosk-body"></div>
       </div>
     </main>
+    <div class="demo" id="demo" data-open="false"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,6 +1,6 @@
 import './styles/tokens.css';
 import './styles/base.css';
-import './styles/review-bar.css';
+import './styles/demo-panel.css';
 import './styles/kiosk.css';
 import './styles/screens.css';
 
@@ -13,7 +13,7 @@ import { FakeDevice } from './sensors/FakeDevice';
 import { SimulatedSource } from './sensors/SimulatedSource';
 import { WebSerialDevice } from './sensors/WebSerialDevice';
 import { KioskView } from './views/KioskView';
-import { ReviewBarView } from './views/ReviewBarView';
+import { DemoPanelView } from './views/DemoPanelView';
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -29,12 +29,12 @@ const kioskView = new KioskView({
   top: requireElement('kiosk-top'),
   body: requireElement('kiosk-body'),
 });
-const reviewBarView = new ReviewBarView(requireElement('review-bar'));
+const demoPanelView = new DemoPanelView(requireElement('demo'));
 
 const controller = new AppController({
   store,
   kioskView,
-  reviewBarView,
+  demoPanelView,
   router: new HashRouter(window.location, window.history),
   createPresetSource: (scenario) => new SimulatedSource(scenario),
   // The fake pilgrim stands with the selected scenario's load, so switching scenario changes the stream.
