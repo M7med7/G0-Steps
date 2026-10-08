@@ -6,19 +6,21 @@ Scope: the Sprint 1 software prototype. It's vanilla TypeScript (strict) in an M
 
 ```
 src/
-  models/       domain types, questions, rules, risk assessment, scenarios, screening log, ScreeningStore
+  models/       domain types, questions, rules, risk assessment, scenarios, screening log, ScreeningStore,
+                pressureProtocol (ESP32 line format + calibration)
   views/        pure render functions (screens/, components/) + KioskView, ReviewBarView
   controllers/  AppController (events, scan lifecycle), HashRouter, DeviceController (3D view input)
   scene/        DeviceScene (WebGL canvas, camera, animations) + stationModel (loads the Blender .glb)
                 + deviceModel (procedural fallback)
-  sensors/      SensorSource interface + SimulatedSource
+  sensors/      SensorSource + SimulatedSource (presets), DeviceSource (4 s capture),
+                FakeDevice and WebSerialDevice (the ESP32 over USB), LineBuffer
   i18n/         Arabic/English copy and translate()
   styles/       tokens.css, base.css, review-bar.css, kiosk.css, screens.css
 ```
 
 - **Models** never touch the DOM, timers or `window`. Domain logic in `models/` is pure and unit-tested.
 - **Views** turn state into markup. Render functions take a `ViewContext` and return a string. They never change state and never attach listeners. Interactive elements carry `data-action` attributes instead.
-- **Controllers** are the only code that listens to events, runs timers, reads sensors or changes the URL. Input from `data-*` attributes is validated with the type guards in `models/types.ts` before it reaches the store.
+- **Controllers** are the only code that listens to events, runs timers, reads sensors or changes the URL. The exception is device drivers in `sensors/`: they own their stream (the fake device's frame timer, the serial read loop), and the controller decides when to connect, capture or calibrate. Input from `data-*` attributes is validated with the type guards in `models/types.ts` before it reaches the store.
 - Dependencies point inward: controllers → models and views; views → models (read-only); models → nothing outside `models/`.
 - `scene/` is the view for the 3D page (`device.html`). It owns the canvas and its animations and never changes state; the camera controls are the one place a view listens to input, because Three.js's OrbitControls does that itself. Taps on the model go through `DeviceController`, which asks the scene what was hit.
 
@@ -55,9 +57,13 @@ interface RiskResult {
 ## 3. Sensor seam
 
 - All sensor data comes through `interface SensorSource { read(): Promise<SensorReadings> }`.
-- `SimulatedSource` takes a scenario and an injectable clock, so it returns deterministic readings for demos and tests.
-- A failed read sets `sensorError` in the store. The scan screen then shows the error and a retry. Errors are never swallowed.
-- The "Simulated data / بيانات تجريبية" badge is always visible on the kiosk while readings are simulated.
+- **Sources:** the review bar picks one of three (ADR-0003).
+  - **Preset:** `SimulatedSource` takes a scenario and an injectable clock, so it returns deterministic readings for demos and tests.
+  - **Fake ESP32** and **ESP32 (USB):** `DeviceSource` records a `PressureDevice` (`FakeDevice` or `WebSerialDevice`) for 4 s, averages the frames and applies the calibration.
+- **The line format and sensor order** live only in `models/pressureProtocol.ts`, and the firmware must match them. The fake device prints the same lines, so it runs through the same parser.
+- **Load is relative:** `(raw − zero) / (reference − zero)`, clamped to 0–1. The doctor view shows it as a percentage, never kPa.
+- **Failed reads:** a failed read sets `sensorError` to its reason (`readFailed`, `noDevice`, `noData`, `noFeet`). The scan screen shows a matching message and a retry. Errors are never swallowed.
+- **Labels:** the "Simulated data / بيانات تجريبية" badge shows whenever the source isn't the real board. "Live sensors" shows only while the real board is connected; otherwise it says the platform isn't connected.
 
 ## 4. Rule engine
 
@@ -86,7 +92,7 @@ interface RiskResult {
 
 ## 7. Security and privacy baseline (prototype)
 
-- No backend and no network calls, apart from Google Fonts and a future local ESP32 connection. Static files from our own origin (like `public/models/station.glb`) are fine.
+- No backend and no network calls, apart from Google Fonts. The ESP32 connects over a local USB cable (Web Serial), and it only works after the person picks the port. Static files from our own origin (like `public/models/station.glb`) are fine.
 - No real pilgrim data in the repo, in fixtures or in screenshots. Use invented records only.
 - The QR code encodes risk level, referral, flagged zones and a "simulated" marker only, with no identifiers.
 - Before any real person is screened: resolve implementation-plan open question 1 (SFDA, PDPL, infection control) and record it as an ADR.

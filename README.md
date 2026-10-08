@@ -15,6 +15,13 @@ npm run dev        # http://localhost:5173
 
 The bar above the kiosk lets you jump between screens, load a low / moderate / high scenario, and switch between Arabic and English. You can also link to a screen directly, for example `#result`.
 
+**Sensor source.** The review bar's **Sensor** control picks where pressure comes from:
+- **Preset:** the low, moderate and high demo scenarios.
+- **Fake ESP32:** a stand-in that streams the board's real data format through the same code, so you can watch a live scan without hardware.
+- **ESP32 (USB):** the real platform over a cable, in Chrome or Edge.
+
+After a scan, the tabs at the top switch between what the pilgrim sees and what the doctor sees. Wiring, upload and calibration steps are in [`firmware/footguard-esp32/README.md`](firmware/footguard-esp32/README.md).
+
 `device.html` (http://localhost:5173/device.html) is an interactive 3D exploded view of the station's eight layers, built with Three.js. Pick a layer in the list, on its label or in the model, and the camera moves in on it. The camera layer also lets you zoom in on each camera.
 
 The station model is built in Blender from a script, `tools/blender/build_station.py`. To change it, edit the script, then rebuild and compress it (needs Blender 5.2):
@@ -47,6 +54,7 @@ src/
   i18n/         Arabic and English copy
   styles/       design tokens and layout
   scene/        Three.js model and scene for the 3D station view (device.html)
+firmware/       ESP32-S3 firmware for the 8 pressure sensors
 tools/blender/  script that builds the station model in Blender
 public/models/  the exported station model (station.glb)
 ```

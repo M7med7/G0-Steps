@@ -1,6 +1,6 @@
 # FootGuard Hajj — Implementation Plan
 
-> Status: pre-pitch. Sprint 0 active; Sprint 1 prototype built. No fixed deadline. Last updated: 2026-10-08.
+> Status: pre-pitch. Sprint 0 active; Sprint 1 prototype built; Sprint 2 (real pressure) built in software, waiting for wired hardware. No fixed deadline. Last updated: 2026-10-09.
 
 ## 1. Executive Summary
 
@@ -26,7 +26,7 @@ The philosophy is to move foot care from treating injuries after they happen to 
 - **Scenario switcher:** three preset scenarios (Low, Moderate, High) for demos.
 
 ### Explicitly out of scope
-- Real sensor input of any kind (Sprint 2+)
+- Thermal and camera input (Sprint 3; the hardware isn't bought). Pressure input is in scope from Sprint 2 (ADR-0003).
 - Thermal or RGB image analysis, and any ML model
 - Backend, accounts, cloud sync, storing real pilgrim data
 - Clinical validation claims
@@ -73,10 +73,15 @@ Decided in ADR-0001 (revised 2026-10-06 to plain MVC).
 - [x] Realistic lighting: baked AO per layer, studio reflections, PBR Neutral tone mapping (ADR-0002 decision 5)
 - [ ] Check frame rate on a real phone; decide on real-time shadows / screen-space AO
 
-### Sprint 2 — Real pressure input [planned]
-- [ ] ESP32-S3 firmware: read 8 FSRs on ADC1, smooth, stream JSON
-- [ ] `Esp32Source` in the app; fall back to simulated when disconnected
-- [ ] Simple per-sensor calibration (zero + reference weight); show relative load, not kPa
+### Sprint 2 — Real pressure input [built in software; hardware not wired yet]
+- [x] ESP32-S3 firmware: read 8 FSRs on ADC1, smooth, stream JSON lines over USB (`firmware/footguard-esp32`). Written, not yet compiled or run
+- [x] App reads the board with Web Serial (`WebSerialDevice` + `DeviceSource`, ADR-0003). Instead of an automatic fallback, the source is picked explicitly: Preset / Fake ESP32 / ESP32 (USB)
+- [x] Fake ESP32 that streams the real protocol through the same parser, for demos without hardware
+- [x] Per-sensor calibration (zero + reference press) in the app; shows relative load, not kPa
+- [x] Result tabs: what the pilgrim sees and what the doctor sees (rules fired, answers, zone loads, data sources)
+- [ ] Wire the 8 FSRs (pins and resistor in the firmware README); first upload and serial check
+- [ ] Calibrate on the real platform; check that sensors don't saturate under a standing adult
+- [ ] Re-tune `HIGH_LOAD` / `ASYMMETRY_GAP` with real readings; medical members sign off the rules
 
 ### Sprint 3 — Thermal and visual [blocked]
 Blocked on the open questions below: plantar imaging geometry and compute platform.
