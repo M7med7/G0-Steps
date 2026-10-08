@@ -78,6 +78,8 @@ export const UI = {
   rightShort: { ar: 'يمين', en: 'Right' },
 
   liveSensors: { ar: 'مستشعرات حية', en: 'Live sensors' },
+  station3d: { ar: 'المحطة ثلاثية الأبعاد', en: 'Station in 3D' },
+  exploreStation: { ar: 'استكشف مكونات المحطة', en: 'Explore inside the station' },
   platformOffline: { ar: 'المنصة غير متصلة', en: 'Platform not connected' },
   scanRecording: { ar: 'جارٍ التسجيل، ابقَ ثابتًا…', en: 'Recording, keep still…' },
 

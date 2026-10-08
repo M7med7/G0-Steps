@@ -134,6 +134,33 @@ html.kiosk-fullscreen body {
   box-shadow: 0 0 0 4px rgb(29 85 96 / 12%);
 }
 
+/* Link to the 3D station view, part of the site's navigation outside the screening flow. */
+.top-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--primary-strong);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out);
+}
+
+.top-link:hover {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.top-link svg {
+  width: 20px;
+  height: 20px;
+}
+
 /* Data-source badge: simulated (amber), live (green) or platform not connected (grey). It can't be hidden. */
 .sim-badge {
   display: inline-flex;

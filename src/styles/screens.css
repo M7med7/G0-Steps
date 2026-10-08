@@ -276,6 +276,51 @@
   }
 }
 
+/* On the start screen: an invitation into the 3D view of the station, at the top of the feet stage. */
+.stage-link {
+  position: relative;
+  z-index: 3;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  background: rgb(255 255 255 / 78%);
+  color: var(--primary-strong);
+  font-size: 19px;
+  font-weight: 500;
+  text-decoration: none;
+  box-shadow: var(--shadow-sheet);
+  transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-short) var(--ease-out);
+  animation: rise-in 500ms var(--ease-out) 600ms both;
+}
+
+.stage-link:hover {
+  background: var(--surface-raised);
+  transform: translateY(-1px);
+}
+
+.stage-link span {
+  flex: 1;
+}
+
+.stage-link svg {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  color: var(--primary);
+  transition: translate var(--dur-short) var(--ease-out);
+}
+
+.kiosk[dir='ltr'] .stage-link:hover svg:last-child {
+  translate: 4px 0;
+}
+
+.kiosk[dir='rtl'] .stage-link:hover svg:last-child {
+  translate: -4px 0;
+}
+
 .stage-hint {
   margin: 0;
   align-self: center;

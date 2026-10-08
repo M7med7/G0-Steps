@@ -3,6 +3,7 @@ import { renderFootMap } from '../components/footMap';
 import { bilingualHeading } from '../components/heading';
 import type { ViewContext } from '../context';
 import { ICONS } from '../icons';
+import { station3dHref } from '../links';
 
 const HOW_IT_WORKS = [UI.stepQuestions, UI.stepScan, UI.stepResult] as const;
 
@@ -19,6 +20,7 @@ export function renderStart(ctx: ViewContext): string {
       <p class="note push-end">${ctx.t(UI.startVolunteer)}</p>
     </section>
     <aside class="foot-pane stage-pane">
+      <a class="stage-link" href="${station3dHref(ctx.language)}">${ICONS.cube}<span>${ctx.t(UI.exploreStation)}</span>${ICONS.arrow}</a>
       ${renderFootMap(ctx, { kind: 'idle' }, null)}
       <p class="stage-hint">${ctx.t(UI.startFootHint)}</p>
     </aside>`;

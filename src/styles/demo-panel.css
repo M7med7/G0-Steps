@@ -262,14 +262,6 @@
   background: var(--error);
 }
 
-.demo-link {
-  align-self: flex-start;
-  color: var(--primary);
-  font-size: 14px;
-  font-weight: 500;
-  text-underline-offset: 4px;
-}
-
 .dot {
   width: 9px;
   height: 9px;

@@ -22,7 +22,7 @@ The app fills the window like the real kiosk would. You can link to a screen dir
 
 After a scan, the tabs at the top switch between what the pilgrim sees and what the doctor sees. Wiring, upload and calibration steps are in [`firmware/footguard-esp32/README.md`](firmware/footguard-esp32/README.md).
 
-`device.html` (http://localhost:5173/device.html) is an interactive 3D exploded view of the station's eight layers, built with Three.js. Pick a layer in the list, on its label or in the model, and the camera moves in on it. The camera layer also lets you zoom in on each camera.
+`device.html` (http://localhost:5173/device.html) is an interactive 3D exploded view of the station's eight layers, built with Three.js. The app links to it from the start screen ("Explore inside the station") and from the top bar on the result screens, and it opens in the same language. Pick a layer in the list, on its label or in the model, and the camera moves in on it. The camera layer also lets you zoom in on each camera.
 
 The station model is built in Blender from a script, `tools/blender/build_station.py`. To change it, edit the script, then rebuild and compress it (needs Blender 5.2):
 

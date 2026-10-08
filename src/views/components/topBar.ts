@@ -3,6 +3,7 @@ import { UI } from '../../i18n/copy';
 import type { Bilingual } from '../../i18n/translate';
 import { showsSimulatedData } from '../../models/ScreeningStore';
 import type { ScreenName } from '../../models/types';
+import { station3dHref } from '../links';
 import type { ViewContext } from '../context';
 import { ICONS } from '../icons';
 
@@ -20,6 +21,24 @@ function viewTabs(ctx: ViewContext): string {
     return `<button type="button" role="tab" aria-selected="${selected}" data-action="navigate" data-screen="${screen}">${ctx.t(label)}</button>`;
   }).join('');
   return `<div class="view-tabs" role="tablist" aria-label="${ctx.t(UI.viewTabs)}">${tabs}</div>`;
+}
+
+/**
+ * The 3D station view is part of the site. The start screen invites to it from the feet stage, and the result screens
+ * link to it here. It's hidden mid-screening so nobody leaves halfway.
+ */
+const SHOWS_STATION_LINK: Readonly<Record<ScreenName, boolean>> = {
+  start: false,
+  questions: false,
+  scan: false,
+  result: true,
+  doctor: true,
+  volunteer: true,
+};
+
+function stationLink(ctx: ViewContext): string {
+  if (!SHOWS_STATION_LINK[ctx.state.screen]) return '';
+  return `<a class="top-link" href="${station3dHref(ctx.language)}">${ICONS.cube}<span>${ctx.t(UI.station3d)}</span></a>`;
 }
 
 /** Simulated data is always labelled. "Live" appears only while the real board is actually connected. */
@@ -44,5 +63,6 @@ function progressRail(ctx: ViewContext): string {
 export function renderTopBar(ctx: ViewContext): string {
   return `<div class="brand"><img class="logo" src="${logoUrl}" alt="" width="45" height="48"><div><b>FootGuard · خطاك</b><small>${ctx.t(UI.brandSub)}</small></div></div>
     ${ctx.state.screen === 'result' || ctx.state.screen === 'doctor' ? viewTabs(ctx) : progressRail(ctx)}
+    ${stationLink(ctx)}
     ${sourceBadge(ctx)}`;
 }

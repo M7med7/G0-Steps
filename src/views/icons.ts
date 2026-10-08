@@ -8,6 +8,7 @@ export const ICONS = {
   cross: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
   arrow: svg('<path d="M5 12h14M13 6l6 6-6 6"/>', ' class="flip-rtl"'),
   dot: '<svg viewBox="0 0 24 24" aria-hidden="true" class="icon-dot"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg>',
+  cube: svg('<path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2z"/><path d="M4 7.2l8 4.4 8-4.4M12 11.6v9.6"/>'),
 } as const;
 
 export const RISK_ICONS: Readonly<Record<RiskLevel, string>> = {

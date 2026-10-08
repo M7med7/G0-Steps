@@ -3,6 +3,7 @@ import './styles/base.css';
 import './styles/device.css';
 
 import { DEVICE_UI } from './i18n/copy';
+import { isLanguage, type Language } from './models/types';
 import { translate } from './i18n/translate';
 import { DeviceController } from './controllers/DeviceController';
 import { DeviceScene } from './scene/DeviceScene';
@@ -22,7 +23,9 @@ function webglAvailable(): boolean {
 }
 
 const stage = requireElement('device-stage');
-const language = document.documentElement.lang === 'en' ? 'en' : 'ar';
+// The screening app links here with ?lang=, so the 3D view opens in the language the person is already using.
+const requested = new URLSearchParams(window.location.search).get('lang');
+const language: Language = isLanguage(requested) ? requested : document.documentElement.lang === 'en' ? 'en' : 'ar';
 
 if (!webglAvailable()) {
   stage.innerHTML = `<p class="d-error">${translate(DEVICE_UI.noWebgl, language)}</p>`;

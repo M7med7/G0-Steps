@@ -113,7 +113,6 @@ function drawer(state: AppState): string {
       <p class="demo-hint">${MODE_HINTS[state.sensorMode]}</p>
       ${platform(state)}
       ${choices('Language', 'set-language', 'language', languages, state.language)}
-      <section class="demo-section"><h3>Hardware</h3><a class="demo-link" href="./device.html">Open the 3D station view</a></section>
     </div>`;
 }
 
