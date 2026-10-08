@@ -32,7 +32,7 @@ Implementation-plan open question 3 (compute platform) is still open. For now th
    - **Load:** `(raw − zero) / (reference − zero)`, clamped to 0–1. It's relative load, never kPa (STANDARDS hard rule 5).
    - The calibration is stored in the browser's `localStorage`. It holds sensor numbers only, never personal data.
 4. **A scan is a 4-second recording**, averaged per sensor. Fewer than 10 frames counts as "no data". A total load below 0.5 counts as "no feet". Each of these failures gets its own message.
-5. **There are three sensor sources**, picked in the review bar:
+5. **There are three sensor sources**, picked in the Demo drawer:
    - **Preset** scenarios (the original demo).
    - **Fake ESP32:** prints the same text lines as the firmware, with noise, and runs them through the same parser and calibration.
    - **ESP32 (USB).**

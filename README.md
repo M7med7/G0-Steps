@@ -13,9 +13,9 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-The bar above the kiosk lets you jump between screens, load a low / moderate / high scenario, and switch between Arabic and English. You can also link to a screen directly, for example `#result`.
+The app fills the window like the real kiosk would. You can link to a screen directly, for example `#result`.
 
-**Sensor source.** The review bar's **Sensor** control picks where pressure comes from:
+**Demo controls.** The small round button in the bottom corner opens the team's Demo drawer: jump to a screen, load a scenario, switch language, and pick where pressure comes from:
 - **Preset:** the low, moderate and high demo scenarios.
 - **Fake ESP32:** a stand-in that streams the board's real data format through the same code, so you can watch a live scan without hardware.
 - **ESP32 (USB):** the real platform over a cable, in Chrome or Edge.

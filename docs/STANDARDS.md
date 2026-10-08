@@ -8,18 +8,19 @@ Scope: the Sprint 1 software prototype. It's vanilla TypeScript (strict) in an M
 src/
   models/       domain types, questions, rules, risk assessment, scenarios, screening log, ScreeningStore,
                 pressureProtocol (ESP32 line format + calibration)
-  views/        pure render functions (screens/, components/) + KioskView, ReviewBarView
+  views/        pure render functions (screens/, components/) + KioskView, DemoPanelView, morph
   controllers/  AppController (events, scan lifecycle), HashRouter, DeviceController (3D view input)
   scene/        DeviceScene (WebGL canvas, camera, animations) + stationModel (loads the Blender .glb)
                 + deviceModel (procedural fallback)
   sensors/      SensorSource + SimulatedSource (presets), DeviceSource (4 s capture),
                 FakeDevice and WebSerialDevice (the ESP32 over USB), LineBuffer
   i18n/         Arabic/English copy and translate()
-  styles/       tokens.css, base.css, review-bar.css, kiosk.css, screens.css
+  styles/       tokens.css, base.css, demo-panel.css, kiosk.css, screens.css
 ```
 
 - **Models** never touch the DOM, timers or `window`. Domain logic in `models/` is pure and unit-tested.
 - **Views** turn state into markup. Render functions take a `ViewContext` and return a string. They never change state and never attach listeners. Interactive elements carry `data-action` attributes instead.
+- `KioskView` draws a new screen fresh, so its enter animation plays. Updates within the same screen go through `morphChildren` (morphdom), which patches only what changed, so running animations (the scan beam, zone pings) aren't restarted. Give an element a `data-key` when a change should replace it and replay its animation (for example each question card).
 - **Controllers** are the only code that listens to events, runs timers, reads sensors or changes the URL. The exception is device drivers in `sensors/`: they own their stream (the fake device's frame timer, the serial read loop), and the controller decides when to connect, capture or calibrate. Input from `data-*` attributes is validated with the type guards in `models/types.ts` before it reaches the store.
 - Dependencies point inward: controllers → models and views; views → models (read-only); models → nothing outside `models/`.
 - `scene/` is the view for the 3D page (`device.html`). It owns the canvas and its animations and never changes state; the camera controls are the one place a view listens to input, because Three.js's OrbitControls does that itself. Taps on the model go through `DeviceController`, which asks the scene what was hit.
@@ -57,7 +58,7 @@ interface RiskResult {
 ## 3. Sensor seam
 
 - All sensor data comes through `interface SensorSource { read(): Promise<SensorReadings> }`.
-- **Sources:** the review bar picks one of three (ADR-0003).
+- **Sources:** the Demo drawer picks one of three (ADR-0003).
   - **Preset:** `SimulatedSource` takes a scenario and an injectable clock, so it returns deterministic readings for demos and tests.
   - **Fake ESP32** and **ESP32 (USB):** `DeviceSource` records a `PressureDevice` (`FakeDevice` or `WebSerialDevice`) for 4 s, averages the frames and applies the calibration.
 - **The line format and sensor order** live only in `models/pressureProtocol.ts`, and the firmware must match them. The fake device prints the same lines, so it runs through the same parser.

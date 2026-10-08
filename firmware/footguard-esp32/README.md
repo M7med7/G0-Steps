@@ -52,7 +52,7 @@ Close the Serial Monitor before connecting the app. Only one program can hold th
 ## Connect the app
 
 1. Open the app in **Chrome or Edge on a computer**. Safari, Firefox and phones don't support Web Serial.
-2. In the review bar, set **Sensor** to **ESP32 (USB)**, click **Connect**, then pick the board's port.
+2. Open the Demo drawer with the small round button in the bottom corner. Set **Sensor source** to **ESP32 (USB)**, click **Connect**, then pick the board's port.
 3. **Calibrate.** Calibration is saved in this browser and survives a reload.
    - **1 · Zero:** with nobody on the platform, click it and wait 2 s.
    - **2 · Reference:** click it, then press each of the 8 sensors in turn with the same weight (for example a 2 kg weight) within 12 s. Each sensor's peak becomes its "full load".

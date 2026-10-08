@@ -39,7 +39,7 @@ Decided in ADR-0001 (revised 2026-10-06 to plain MVC).
 - **App:** vanilla TypeScript (strict), client-only, built with Vite and tested with Vitest. Targets a 10" landscape touchscreen (1280×800) in a browser and reflows below 760px.
 - **MVC layout:**
   - `src/models/`: domain types, questions, rules, `assessRisk()`, scenarios, the screening log and `ScreeningStore` (immutable state with subscribers)
-  - `src/views/`: pure render functions per screen and component, plus `KioskView` and `ReviewBarView`, which own the DOM
+  - `src/views/`: pure render functions per screen and component, plus `KioskView` and `DemoPanelView` (the team's demo drawer), which own the DOM and patch it with `morphChildren`
   - `src/controllers/`: `AppController` (events, scan lifecycle) and `HashRouter`
   - `src/sensors/`: the `SensorSource` seam; `src/i18n/`: Arabic and English copy; `src/styles/`: tokens and layout CSS
 - **Sensor seam:** `SensorSource` interface, implemented first by `SimulatedSource`. A future `Esp32Source` will read pressure from the ESP32-S3 over Wi-Fi WebSocket (preferred) or Web Serial.
