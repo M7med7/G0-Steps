@@ -5,7 +5,8 @@ Run headless:
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup \
     --python tools/blender/build_station.py -- --out <dir> [--render] [--samples 128] [--export]
 
-Output in <dir>: station.blend, textures/, previews (with --render) and station-raw.glb (with --export).
+Output in <dir>: station.blend, textures/, previews (with --render), and with --export the per-layer
+ambient-occlusion bakes (textures/<layer>-ao.png) and station-raw.glb.
 
 Units are metres. The footprint is 44 × 34 cm, matching src/scene/deviceModel.ts (1 scene unit = 10 cm).
 Sizes are illustrative, not engineering dimensions. Front faces -Y, toes point to +Y, Z is up.
@@ -657,6 +658,114 @@ def report(station):
     print(f'  {"total":16s} {total:7d} tris')
 
 
+# ---------------------------------------------------------------- baked ambient occlusion
+
+AO_SIZE = 1024
+# How far Cycles looks for nearby surfaces. A few centimetres gives contact shading without darkening whole parts.
+AO_DISTANCE = 0.03
+AO_SAMPLES = 64
+
+
+def use_gpu(scene):
+    scene.render.engine = 'CYCLES'
+    prefs = bpy.context.preferences.addons['cycles'].preferences
+    try:
+        prefs.compute_device_type = 'METAL'
+        prefs.get_devices()
+        for device in prefs.devices:
+            device.use = True
+        scene.cycles.device = 'GPU'
+    except (TypeError, AttributeError):
+        scene.cycles.device = 'CPU'
+
+
+def gltf_output_group():
+    """The node group the glTF exporter reads the occlusion map from."""
+    name = 'glTF Material Output'
+    group = bpy.data.node_groups.get(name)
+    if group is None:
+        group = bpy.data.node_groups.new(name, 'ShaderNodeTree')
+        group.interface.new_socket(name='Occlusion', in_out='INPUT', socket_type='NodeSocketFloat')
+        group.nodes.new('NodeGroupInput')
+    return group
+
+
+def add_ao_nodes(material, image):
+    """Points a material's occlusion at the layer's AO image, and makes that image the bake target."""
+    nodes, links = material.node_tree.nodes, material.node_tree.links
+    uv = nodes.new('ShaderNodeUVMap')
+    uv.uv_map = 'AO'
+    tex = nodes.new('ShaderNodeTexImage')
+    tex.image = image
+    links.new(uv.outputs['UV'], tex.inputs['Vector'])
+    split = nodes.new('ShaderNodeSeparateColor')
+    links.new(tex.outputs['Color'], split.inputs['Color'])
+    output = nodes.new('ShaderNodeGroup')
+    output.node_tree = gltf_output_group()
+    links.new(split.outputs['Red'], output.inputs['Occlusion'])
+    nodes.active = tex
+
+
+def is_blended(obj):
+    material = obj.active_material
+    return material is not None and getattr(material, 'surface_render_method', '') == 'BLENDED'
+
+
+def select_only(objects):
+    bpy.ops.object.select_all(action='DESELECT')
+    for obj in objects:
+        obj.select_set(True)
+    bpy.context.view_layer.objects.active = objects[0]
+
+
+def unwrap_for_ao(objects):
+    """A second UV map, 'AO', that packs every part of the layer into one texture without overlaps."""
+    for obj in objects:
+        uv = obj.data.uv_layers.get('AO') or obj.data.uv_layers.new(name='AO')
+        obj.data.uv_layers.active = uv
+    select_only(objects)
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=math.radians(66), island_margin=0.004)
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def bake_ambient_occlusion(station, out_dir):
+    """Bakes each layer on its own, so the shading stays right when the website pulls the layers apart."""
+    scene = bpy.context.scene
+    use_gpu(scene)
+    scene.cycles.samples = AO_SAMPLES
+    scene.render.bake.margin = 8
+    if scene.world is None:
+        scene.world = bpy.data.worlds.new('Bake')
+    scene.world.light_settings.distance = AO_DISTANCE
+
+    folder = os.path.join(out_dir, 'textures')
+    for layer in LAYERS:
+        meshes = [o for o in bpy.data.objects[layer].children_recursive if o.type == 'MESH']
+        targets = [o for o in meshes if not is_blended(o)]
+        # White where no part lands, so texels bleeding past a UV edge can only lighten, never darken.
+        image = bpy.data.images.new(f'{layer}-ao', AO_SIZE, AO_SIZE, alpha=False)
+        image.generated_color = (1.0, 1.0, 1.0, 1.0)
+        image.colorspace_settings.name = 'Non-Color'
+        for material in {slot.material for o in targets for slot in o.material_slots if slot.material}:
+            add_ao_nodes(material, image)
+
+        others = [o for o in station.all_objects if o.type == 'MESH' and o not in meshes]
+        for obj in others:
+            obj.hide_render = True
+        unwrap_for_ao(targets)
+        select_only(targets)
+        bpy.ops.object.bake(type='AO', use_clear=False)
+        for obj in others:
+            obj.hide_render = False
+
+        image.filepath_raw = os.path.join(folder, f'{layer}-ao.png')
+        image.file_format = 'PNG'
+        image.save()
+        print(f'  baked {layer} ambient occlusion')
+
+
 def set_explode(amount):
     for layer in LAYERS:
         z0, z1 = ASSEMBLED_Z[layer], EXPLODED_Z[layer]
@@ -668,16 +777,7 @@ def setup_studio(samples):
     studio = bpy.data.collections.new('Studio')
     scene.collection.children.link(studio)
 
-    scene.render.engine = 'CYCLES'
-    prefs = bpy.context.preferences.addons['cycles'].preferences
-    try:
-        prefs.compute_device_type = 'METAL'
-        prefs.get_devices()
-        for device in prefs.devices:
-            device.use = True
-        scene.cycles.device = 'GPU'
-    except (TypeError, AttributeError):
-        scene.cycles.device = 'CPU'
+    use_gpu(scene)
     scene.cycles.samples = samples
     scene.cycles.use_denoising = True
     scene.view_settings.view_transform = 'AgX'
@@ -770,6 +870,7 @@ def main():
     report(station)
 
     if args.export:
+        bake_ambient_occlusion(station, out)
         export_glb(os.path.join(out, 'station-raw.glb'), station)
 
     if args.render:
