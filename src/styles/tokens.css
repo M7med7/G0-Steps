@@ -14,6 +14,12 @@
   --accent: #b08326;
   --zone-base: #cbdcd9;
 
+  /* Backdrop of the 3D device page, from the team's concept render. */
+  --device-bg-from: #a8d3cf;
+  --device-bg-to: #5f8f96;
+  --device-ink: #0f3a42;
+  --device-glass: rgba(255, 255, 255, 0.72);
+
   --success: #2e7148;
   --success-tint: #e3f0e7;
   --success-ink: #1f5435;

@@ -8,7 +8,8 @@ Scope: the Sprint 1 software prototype. It's vanilla TypeScript (strict) in an M
 src/
   models/       domain types, questions, rules, risk assessment, scenarios, screening log, ScreeningStore
   views/        pure render functions (screens/, components/) + KioskView, ReviewBarView
-  controllers/  AppController (events, scan lifecycle), HashRouter
+  controllers/  AppController (events, scan lifecycle), HashRouter, DeviceController (3D view input)
+  scene/        DeviceScene (WebGL canvas, camera, animations) + deviceModel (procedural 3D layers)
   sensors/      SensorSource interface + SimulatedSource
   i18n/         Arabic/English copy and translate()
   styles/       tokens.css, base.css, review-bar.css, kiosk.css, screens.css
@@ -18,6 +19,7 @@ src/
 - **Views** turn state into markup. Render functions take a `ViewContext` and return a string. They never change state and never attach listeners. Interactive elements carry `data-action` attributes instead.
 - **Controllers** are the only code that listens to events, runs timers, reads sensors or changes the URL. Input from `data-*` attributes is validated with the type guards in `models/types.ts` before it reaches the store.
 - Dependencies point inward: controllers → models and views; views → models (read-only); models → nothing outside `models/`.
+- `scene/` is the view for the 3D page (`device.html`). It owns the canvas and its animations and never changes state; the camera controls are the one place a view listens to input, because Three.js's OrbitControls does that itself. Taps on the model go through `DeviceController`, which asks the scene what was hit.
 
 ## 2. Data model
 

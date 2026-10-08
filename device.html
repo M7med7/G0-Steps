@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FootGuard · مكونات محطة الفحص</title>
+    <meta name="description" content="Interactive 3D exploded view of the FootGuard screening station." />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Alexandria:wght@600;700&family=Readex+Pro:wght@400;500;600&display=swap"
+    />
+  </head>
+  <body class="device-page">
+    <header class="d-top" id="device-top"></header>
+    <main class="d-main">
+      <div class="d-stage" id="device-stage">
+        <div class="d-canvas-host" id="device-canvas"></div>
+        <p class="d-hint" id="device-hint"></p>
+      </div>
+      <aside class="d-panel" id="device-panel" aria-live="polite"></aside>
+    </main>
+    <script type="module" src="/src/device.ts"></script>
+  </body>
+</html>

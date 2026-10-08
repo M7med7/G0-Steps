@@ -39,6 +39,7 @@ export class ReviewBarView {
     this.root.innerHTML = `<div class="review-title"><img class="review-logo" src="${logoUrl}" alt="FootGuard Hajj logo" width="34" height="36"><div><strong>FootGuard Hajj · خطاك</strong><span>Screening station prototype for team review. All readings are simulated.</span></div></div>
       ${segmented('Screen', 'navigate', 'screen', screens, state.screen)}
       ${segmented('Scenario', 'set-scenario', 'scenario', scenarios, state.scenario)}
-      ${segmented('Language', 'set-language', 'language', languages, state.language)}`;
+      ${segmented('Language', 'set-language', 'language', languages, state.language)}
+      <div class="control-group"><span>Hardware</span><a class="review-link" href="./device.html">3D station view</a></div>`;
   }
 }

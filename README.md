@@ -15,6 +15,8 @@ npm run dev        # http://localhost:5173
 
 The bar above the kiosk lets you jump between screens, load a low / moderate / high scenario, and switch between Arabic and English. You can also link to a screen directly, for example `#result`.
 
+`device.html` (http://localhost:5173/device.html) is an interactive 3D exploded view of the station's eight layers, built with Three.js. Pick a layer in the list, on its label or in the model, and the camera moves in on it. The camera layer also lets you zoom in on each camera.
+
 ```bash
 npm test           # rule engine, store, sensor and copy tests
 npm run typecheck
@@ -33,6 +35,7 @@ src/
   sensors/      SensorSource interface and the simulated source
   i18n/         Arabic and English copy
   styles/       design tokens and layout
+  scene/        Three.js model and scene for the 3D station view (device.html)
 ```
 
 - The risk rules live in `src/models/rules.ts`. They are illustrative and not clinically validated.

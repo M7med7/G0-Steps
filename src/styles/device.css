@@ -1,0 +1,414 @@
+/* The 3D device page (device.html). */
+
+body.device-page {
+  padding: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--device-bg-from), var(--device-bg-to));
+  color: var(--device-ink);
+}
+
+.d-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  padding: 12px 20px;
+}
+
+.d-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.d-brand img {
+  height: 36px;
+  width: auto;
+  flex: none;
+}
+
+.d-brand span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.d-brand b {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+.d-brand small {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.d-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.d-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 16px;
+  border: 1px solid rgba(15, 58, 66, 0.2);
+  border-radius: 999px;
+  background: var(--device-glass);
+  color: var(--device-ink);
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  transition: background 0.2s var(--ease-out);
+}
+
+.d-btn:hover {
+  background: var(--surface-raised);
+}
+
+.d-btn[aria-pressed='true'] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.d-btn-quiet {
+  background: transparent;
+}
+
+.d-main {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+}
+
+.d-stage {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+}
+
+.d-canvas-host {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+.d-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.d-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* CSS2DRenderer positions labels with transforms from the top left corner, so the layer must not be right to left. */
+  direction: ltr;
+}
+
+/* Labels with a dashed leader line, like the concept render. Always laid out left to right so the line points at the layer. */
+.d-label {
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  pointer-events: auto;
+  color: var(--device-ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.d-label-text {
+  padding: 4px 10px;
+  border-radius: 999px;
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out);
+}
+
+.d-label:hover .d-label-text,
+.d-label:focus-visible .d-label-text {
+  background: var(--device-ink);
+  color: var(--on-primary);
+}
+
+.d-leader {
+  width: 64px;
+  border-top: 2px dashed rgba(255, 255, 255, 0.85);
+  position: relative;
+}
+
+.d-leader::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: -5px;
+  top: -6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(15, 58, 66, 0.25);
+}
+
+.d-label-part {
+  flex-direction: column;
+}
+
+.d-label-part .d-label-text {
+  background: var(--device-glass);
+}
+
+.d-label-part .d-leader {
+  width: 0;
+  height: 28px;
+  border-top: 0;
+  border-inline-start: 2px dashed rgba(255, 255, 255, 0.9);
+}
+
+.d-label-part .d-leader::after {
+  inset-inline-end: auto;
+  top: auto;
+  bottom: -5px;
+  left: -6px;
+}
+
+.d-hint {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 12px;
+  margin: 0;
+  text-align: center;
+  font-size: 13px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.d-error {
+  max-width: 420px;
+  margin: 15vh auto 0;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: var(--device-glass);
+  text-align: center;
+}
+
+.d-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 16px 16px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: var(--device-glass);
+  backdrop-filter: blur(14px);
+  overflow-y: auto;
+}
+
+.d-panel-body {
+  flex: 1;
+}
+
+.d-panel h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  line-height: 1.25;
+  color: var(--primary-strong);
+  outline: none;
+}
+
+.d-panel h2 {
+  margin: 20px 0 8px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.d-lede {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.d-layer-list {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.d-layer-btn {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  text-align: start;
+  font-weight: 500;
+  font-size: 16px;
+  transition: background 0.2s var(--ease-out);
+}
+
+.d-layer-btn:hover {
+  background: var(--surface-raised);
+}
+
+.d-layer-btn i {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-style: normal;
+  font-size: 13px;
+}
+
+.d-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.d-back-icon svg {
+  width: 18px;
+  height: 18px;
+  transform: scaleX(-1);
+}
+
+[dir='rtl'] .d-back-icon svg {
+  transform: none;
+}
+
+.d-count {
+  margin: 10px 0 2px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.d-parts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.d-part-btn {
+  min-height: 44px;
+  padding-inline: 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  font-weight: 500;
+}
+
+.d-part-btn[aria-pressed='true'] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.d-part-detail {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+
+.d-part-detail h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.d-part-detail p {
+  margin: 0;
+}
+
+.d-step {
+  display: flex;
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.d-step .d-btn {
+  flex: 1;
+  justify-content: center;
+  background: var(--surface-raised);
+}
+
+.d-panel-foot {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.d-panel-foot p {
+  margin: 4px 0 0;
+}
+
+@media (max-width: 760px) {
+  body.device-page {
+    height: auto;
+    min-height: 100dvh;
+    overflow: auto;
+  }
+
+  .d-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 62vh auto;
+  }
+
+  .d-panel {
+    margin: 0 16px 16px;
+    padding: 18px;
+  }
+
+  .d-panel h1 {
+    font-size: 23px;
+  }
+
+  .d-label {
+    font-size: 12px;
+  }
+
+  .d-leader {
+    width: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d-btn,
+  .d-layer-btn,
+  .d-label-text {
+    transition: none;
+  }
+}

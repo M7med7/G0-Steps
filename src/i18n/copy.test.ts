@@ -1,8 +1,20 @@
 import { describe, expect, it } from 'vitest';
+import { DEVICE_LAYERS, LAYER_PARTS } from '../models/deviceLayers';
 import { QUESTION_ORDER } from '../models/questions';
 import { RECOMMENDATION_PRIORITY } from '../models/rules';
 import { ZONES } from '../models/types';
-import { FLAG_REASONS, PILGRIM_LANGUAGES, QUESTIONS, RECOMMENDATIONS, RISK_LEVELS, UI, ZONE_NAMES } from './copy';
+import {
+  DEVICE_LAYER_COPY,
+  DEVICE_PART_COPY,
+  DEVICE_UI,
+  FLAG_REASONS,
+  PILGRIM_LANGUAGES,
+  QUESTIONS,
+  RECOMMENDATIONS,
+  RISK_LEVELS,
+  UI,
+  ZONE_NAMES,
+} from './copy';
 import { translate, type Bilingual } from './translate';
 
 function collectBilingual(value: unknown, path: string, out: [string, Bilingual][]): void {
@@ -17,7 +29,11 @@ function collectBilingual(value: unknown, path: string, out: [string, Bilingual]
 
 describe('copy', () => {
   const all: [string, Bilingual][] = [];
-  collectBilingual({ UI, QUESTIONS, ZONE_NAMES, FLAG_REASONS, RISK_LEVELS, RECOMMENDATIONS, PILGRIM_LANGUAGES }, 'copy', all);
+  collectBilingual(
+    { UI, QUESTIONS, ZONE_NAMES, FLAG_REASONS, RISK_LEVELS, RECOMMENDATIONS, PILGRIM_LANGUAGES, DEVICE_UI, DEVICE_LAYER_COPY, DEVICE_PART_COPY },
+    'copy',
+    all,
+  );
 
   it('has non-empty Arabic and English for every string', () => {
     expect(all.length).toBeGreaterThan(50);
@@ -35,6 +51,10 @@ describe('copy', () => {
     QUESTION_ORDER.forEach((key) => expect(QUESTIONS[key]).toBeDefined());
     ZONES.forEach((zone) => expect(ZONE_NAMES[zone]).toBeDefined());
     RECOMMENDATION_PRIORITY.forEach((key) => expect(RECOMMENDATIONS[key]).toBeDefined());
+    DEVICE_LAYERS.forEach((layer) => {
+      expect(DEVICE_LAYER_COPY[layer]).toBeDefined();
+      LAYER_PARTS[layer].forEach((part) => expect(DEVICE_PART_COPY[part]).toBeDefined());
+    });
   });
 
   it('fills placeholders and leaves unknown ones visible', () => {
