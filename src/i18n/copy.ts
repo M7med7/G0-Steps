@@ -191,6 +191,7 @@ export const DEVICE_UI = {
     ar: 'نموذج توضيحي ثلاثي الأبعاد مبني على تصور الفريق، وليس بمقاس حقيقي.',
     en: "Illustrative 3D model based on the team's concept render. Not to scale.",
   },
+  loading: { ar: 'جارٍ تحميل النموذج ثلاثي الأبعاد…', en: 'Loading the 3D model…' },
   noWebgl: {
     ar: 'هذا المتصفح لا يدعم WebGL، لذلك لا يمكن عرض النموذج ثلاثي الأبعاد.',
     en: "This browser doesn't support WebGL, so the 3D model can't be shown.",

@@ -9,7 +9,8 @@ src/
   models/       domain types, questions, rules, risk assessment, scenarios, screening log, ScreeningStore
   views/        pure render functions (screens/, components/) + KioskView, ReviewBarView
   controllers/  AppController (events, scan lifecycle), HashRouter, DeviceController (3D view input)
-  scene/        DeviceScene (WebGL canvas, camera, animations) + deviceModel (procedural 3D layers)
+  scene/        DeviceScene (WebGL canvas, camera, animations) + stationModel (loads the Blender .glb)
+                + deviceModel (procedural fallback)
   sensors/      SensorSource interface + SimulatedSource
   i18n/         Arabic/English copy and translate()
   styles/       tokens.css, base.css, review-bar.css, kiosk.css, screens.css
@@ -85,7 +86,7 @@ interface RiskResult {
 
 ## 7. Security and privacy baseline (prototype)
 
-- No backend and no network calls, apart from Google Fonts and a future local ESP32 connection.
+- No backend and no network calls, apart from Google Fonts and a future local ESP32 connection. Static files from our own origin (like `public/models/station.glb`) are fine.
 - No real pilgrim data in the repo, in fixtures or in screenshots. Use invented records only.
 - The QR code encodes risk level, referral, flagged zones and a "simulated" marker only, with no identifiers.
 - Before any real person is screened: resolve implementation-plan open question 1 (SFDA, PDPL, infection control) and record it as an ADR.

@@ -6,8 +6,8 @@ export default defineConfig({
   base: './',
   build: {
     target: 'es2022',
-    // three.js is most of the 3D page's bundle (about 160 kB gzipped). It loads only on device.html.
-    chunkSizeWarningLimit: 700,
+    // three.js and its glTF loader are most of the 3D page's bundle (about 185 kB gzipped). They load only on device.html.
+    chunkSizeWarningLimit: 750,
     rolldownOptions: {
       // Two pages: the screening app and the 3D view of the station.
       input: {

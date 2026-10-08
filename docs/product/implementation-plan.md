@@ -69,7 +69,7 @@ Decided in ADR-0001 (revised 2026-10-06 to plain MVC).
 - [x] `device.html`: interactive exploded view of the station's eight layers (ADR-0002)
 - [x] Select a layer or camera to animate the camera in; explode/assemble; ar/en
 - [ ] Mechatronics member confirms layer order, materials and parts
-- [ ] Replace the procedural model with a Blender model (`.glb`, layers named by id)
+- [x] Replace the procedural model with a Blender model (`.glb`, layers named by id); procedural model kept as fallback
 
 ### Sprint 2 — Real pressure input [planned]
 - [ ] ESP32-S3 firmware: read 8 FSRs on ADC1, smooth, stream JSON

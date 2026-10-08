@@ -7,7 +7,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js';
 import { DEVICE_LAYERS, type DeviceFocus, type DeviceLayerId, type DevicePartId, type DeviceSelection } from '../models/deviceLayers';
-import { buildDevice, buildGroundShadow, layerY, type LayerObject } from './deviceModel';
+import { buildGroundShadow, layerY, type LayerObject } from './deviceModel';
 
 const CAMERA_SECONDS = 1.1;
 const EXPLODE_SECONDS = 1.3;
@@ -47,7 +47,6 @@ export class DeviceScene {
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
   private readonly controls: OrbitControls;
-  private readonly layers: Map<DeviceLayerId, LayerObject>;
   private readonly base = new Map<THREE.MeshStandardMaterial, MaterialBase>();
   private readonly alpha = new Map<DeviceLayerId, { current: number; target: number }>();
   private readonly layerLabels = new Map<DeviceLayerId, CSS2DObject>();
@@ -65,6 +64,8 @@ export class DeviceScene {
   constructor(
     private readonly host: HTMLElement,
     private readonly reduceMotion: boolean,
+    /** From the Blender model (stationModel.ts) or the procedural fallback (deviceModel.ts). */
+    private readonly layers: Map<DeviceLayerId, LayerObject>,
   ) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -84,7 +85,6 @@ export class DeviceScene {
     key.position.set(4, 10, 6);
     this.scene.add(key, new THREE.HemisphereLight(0xffffff, 0x5d8f95, 0.6));
 
-    this.layers = buildDevice();
     for (const layer of this.layers.values()) {
       this.scene.add(layer.group);
       this.alpha.set(layer.id, { current: 1, target: 1 });

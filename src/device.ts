@@ -6,6 +6,8 @@ import { DEVICE_UI } from './i18n/copy';
 import { translate } from './i18n/translate';
 import { DeviceController } from './controllers/DeviceController';
 import { DeviceScene } from './scene/DeviceScene';
+import { buildDevice } from './scene/deviceModel';
+import { loadStationModel } from './scene/stationModel';
 
 function requireElement(id: string): HTMLElement {
   const el = document.getElementById(id);
@@ -24,8 +26,24 @@ const language = document.documentElement.lang === 'en' ? 'en' : 'ar';
 if (!webglAvailable()) {
   stage.innerHTML = `<p class="d-error">${translate(DEVICE_UI.noWebgl, language)}</p>`;
 } else {
+  void start();
+}
+
+async function start(): Promise<void> {
+  const loading = document.createElement('p');
+  loading.className = 'd-loading';
+  loading.setAttribute('role', 'status');
+  loading.textContent = translate(DEVICE_UI.loading, language);
+  stage.append(loading);
+  // The Blender model, or the procedural one if the file can't be loaded or is missing a layer.
+  const layers = await loadStationModel().catch((error: unknown) => {
+    console.warn('Station model not loaded, using the built-in model instead.', error);
+    return buildDevice();
+  });
+  loading.remove();
+
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const scene = new DeviceScene(requireElement('device-canvas'), reduceMotion);
+  const scene = new DeviceScene(requireElement('device-canvas'), reduceMotion, layers);
   const controller = new DeviceController(
     scene,
     {
