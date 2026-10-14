@@ -1,19 +1,19 @@
-import { SENSOR_ERRORS, UI } from '../../i18n/copy';
 import { isScanComplete, SENSOR_COUNT, usesDevice } from '../../models/ScreeningStore';
 import { renderFootMap, renderLegend } from '../components/footMap';
-import { bilingualHeading } from '../components/heading';
+import { localeHeading } from '../components/heading';
 import type { ViewContext } from '../context';
 import { ICONS } from '../icons';
+import type { SensorErrorReason } from '../../models/types';
 
 const SPINNER = '<span class="spinner" aria-hidden="true"></span>';
 const DASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" aria-hidden="true"><path d="M7 12h10"/></svg>';
 
-function renderSensorError(ctx: ViewContext, reason: keyof typeof SENSOR_ERRORS): string {
+function renderSensorError(ctx: ViewContext, reason: SensorErrorReason): string {
   return `<section class="guide">
-      ${bilingualHeading(ctx, UI.scanTitle)}
-      <p class="error-message" role="alert">${ctx.t(SENSOR_ERRORS[reason])}</p>
+      ${localeHeading(ctx, (l) => l.scanTitle)}
+      <p class="error-message" role="alert">${ctx.l.sensorErrors[reason]}</p>
       <div class="row push-end">
-        <button type="button" class="btn btn-primary" data-action="navigate" data-screen="scan">${ctx.t(UI.retry)}</button>
+        <button type="button" class="btn btn-primary" data-action="navigate" data-screen="scan">${ctx.l.retry}</button>
       </div>
     </section>
     <aside class="foot-pane stage-pane">${renderFootMap(ctx, { kind: 'idle' }, null)}</aside>`;
@@ -38,30 +38,30 @@ export function renderScan(ctx: ViewContext): string {
   // A device records all 8 sensors at once, so it shows the live map instead of sensors reporting one by one.
   const recording = usesDevice(state) && !done;
   const percent = done ? 100 : Math.round((read / SENSOR_COUNT) * 100);
-  const status = done ? ctx.t(UI.scanComplete) : recording ? ctx.t(UI.scanRecording) : ctx.t(UI.scanReading, { k: read, total: SENSOR_COUNT });
+  const status = done ? ctx.l.scanComplete : recording ? ctx.l.scanRecording : ctx.fill(ctx.l.scanReading, { k: read, total: SENSOR_COUNT });
   const map = recording
     ? renderFootMap(ctx, { kind: 'live' }, state.livePressure)
     : renderFootMap(ctx, { kind: 'scanning', sensorsRead: read }, state.readings?.pressure ?? null);
 
   return `<section class="guide scan">
-      ${bilingualHeading(ctx, done ? UI.scanComplete : UI.scanTitle)}
-      <p class="lede">${ctx.t(UI.scanLede)}</p>
+      ${localeHeading(ctx, (l) => (done ? l.scanComplete : l.scanTitle), 'h2')}
+      <p class="lede">${ctx.l.scanLede}</p>
       <div class="scan-meter">
         ${progressRing(percent, status, done)}
         <p class="scan-status" aria-live="polite">${status}</p>
       </div>
       <ul class="sensors">
-        <li class="${done ? 'ok' : 'busy'}">${done ? ICONS.check : SPINNER}<span>${ctx.t(UI.sensorPressure)}</span><span>${done ? `${SENSOR_COUNT}/${SENSOR_COUNT}` : recording ? `${percent}%` : `${read}/${SENSOR_COUNT}`}</span></li>
-        <li class="off">${DASH}<span>${ctx.t(UI.sensorThermal)}</span><span>${ctx.t(UI.notConnected)}</span></li>
-        <li class="off">${DASH}<span>${ctx.t(UI.sensorCamera)}</span><span>${ctx.t(UI.notConnected)}</span></li>
+        <li class="${done ? 'ok' : 'busy'}">${done ? ICONS.check : SPINNER}<span>${ctx.l.sensorPressure}</span><span>${done ? `${SENSOR_COUNT}/${SENSOR_COUNT}` : recording ? `${percent}%` : `${read}/${SENSOR_COUNT}`}</span></li>
+        <li class="off">${DASH}<span>${ctx.l.sensorThermal}</span><span>${ctx.l.notConnected}</span></li>
+        <li class="off">${DASH}<span>${ctx.l.sensorCamera}</span><span>${ctx.l.notConnected}</span></li>
       </ul>
       <div class="row push-end">
         ${
           done
-            ? `<button type="button" class="btn btn-primary btn-cta" data-action="navigate" data-screen="result">${ctx.t(UI.showResult)}${ICONS.arrow}</button>`
+            ? `<button type="button" class="btn btn-primary btn-cta" data-action="navigate" data-screen="result">${ctx.l.showResult}${ICONS.arrow}</button>`
             : recording
               ? ''
-              : `<button type="button" class="text-button" data-action="skip-scan">${ctx.t(UI.skipWait)}</button>`
+              : `<button type="button" class="text-button" data-action="skip-scan">${ctx.l.skipWait}</button>`
         }
       </div>
     </section>

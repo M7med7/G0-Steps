@@ -1,51 +1,68 @@
-import { QUESTIONS, UI } from '../../i18n/copy';
-import { QUESTION_COUNT, QUESTION_ORDER } from '../../models/questions';
+import { isQuestionComplete, QUESTION_COUNT, QUESTIONS } from '../../models/questions';
 import { currentQuestion } from '../../models/ScreeningStore';
-import type { AnswerKey } from '../../models/types';
-import { bilingualHeading } from '../components/heading';
+import type { Response } from '../../models/types';
+import { answerButtons, sidePicker } from '../components/answerControls';
+import { localeHeading } from '../components/heading';
 import type { ViewContext } from '../context';
 import { ICONS } from '../icons';
 
-function answerChip(ctx: ViewContext, key: AnswerKey): string {
-  if (!ctx.state.answered[key]) return '<span class="chip">—</span>';
-  return ctx.state.answers[key]
-    ? `<span class="chip chip-yes">${ctx.t(UI.yes)}</span>`
-    : `<span class="chip">${ctx.t(UI.no)}</span>`;
+function answerChip(ctx: ViewContext, response: Response): string {
+  if (response.answer === null) return '<span class="chip">—</span>';
+  const side = response.answer === 'yes' && response.side ? ` · ${ctx.l.sides[response.side]}` : '';
+  return `<span class="chip${response.answer === 'yes' ? ' chip-yes' : ''}">${ctx.l[response.answer]}${side}</span>`;
 }
 
+/** After a "yes": which foot, the follow-up, and Next once both are answered. */
+function extras(ctx: ViewContext): string {
+  const { state, l } = ctx;
+  const question = currentQuestion(state);
+  const response = state.answers[question.key];
+  if (response.answer !== 'yes' || (!question.asksSide && !question.followUp)) return '';
+  const side = question.asksSide
+    ? `<div class="q-extra"><b>${l.whichFoot}</b>${sidePicker(l, response, 'question-side')}</div>`
+    : '';
+  const followUp = question.followUp
+    ? `<div class="q-extra"><b>${l.followUps[question.followUp].question}</b>${answerButtons(l, state.answers[question.followUp].answer, 'follow-up', {}, 'compact')}</div>`
+    : '';
+  const ready = isQuestionComplete(question, state.answers);
+  return `<div class="q-extras">${side}${followUp}</div>
+    <div class="row push-end">
+      <button type="button" class="btn btn-primary btn-small btn-cta" data-action="next-question"${ready ? '' : ' disabled'}>${l.next}${ICONS.arrow}</button>
+    </div>`;
+}
+
+/** Step 3, for the pilgrim, in their language. */
 export function renderQuestions(ctx: ViewContext): string {
-  const { state } = ctx;
-  const key = currentQuestion(state);
-  const copy = QUESTIONS[key];
-  const isAnswered = Boolean(state.answered[key]);
-  const value = state.answers[key];
+  const { state, l } = ctx;
+  const question = currentQuestion(state);
+  const copy = l.questions[question.key];
 
-  const answerList = QUESTION_ORDER.map(
-    (k, i) => `<li class="${i === state.questionIndex ? 'current' : ''}"><span>${ctx.t(QUESTIONS[k].short)}</span>${answerChip(ctx, k)}</li>`,
+  const answerList = QUESTIONS.map(
+    (q, i) => `<li class="${i === state.questionIndex ? 'current' : ''}"><span>${l.questions[q.key].short}</span>${answerChip(ctx, state.answers[q.key])}</li>`,
   ).join('');
-
-  const segments = QUESTION_ORDER.map(
+  const segments = QUESTIONS.map(
     (_, i) => `<li class="${i < state.questionIndex ? 'done' : i === state.questionIndex ? 'now' : ''}"></li>`,
   ).join('');
 
+  const more = extras(ctx);
   // The card is keyed by question, so each new question slides in instead of just swapping text.
   return `<section class="guide">
       <div class="q-head">
-        <span class="count">${ctx.t(UI.questionCount, { n: state.questionIndex + 1, total: QUESTION_COUNT })}</span>
+        <div class="q-count-row">
+          <span class="count">${ctx.fill(l.questionCount, { n: state.questionIndex + 1, total: QUESTION_COUNT })}</span>
+          <button type="button" class="text-button" data-action="previous-question">${l.back}</button>
+        </div>
         <ol class="q-progress" aria-hidden="true">${segments}</ol>
       </div>
-      <div class="q-card" data-key="q-${key}">
-        ${bilingualHeading(ctx, copy.question)}
-        <div class="row answers">
-          <button type="button" class="btn btn-ghost btn-answer" data-action="answer" data-value="yes" aria-pressed="${isAnswered && value}">${ICONS.check}${ctx.t(UI.yes)}</button>
-          <button type="button" class="btn btn-ghost btn-answer" data-action="answer" data-value="no" aria-pressed="${isAnswered && !value}">${ICONS.cross}${ctx.t(UI.no)}</button>
-        </div>
+      <div class="q-card${more ? ' has-extras' : ''}" data-key="q-${question.key}">
+        ${localeHeading(ctx, (s) => s.questions[question.key].question, 'h2')}
+        ${answerButtons(l, state.answers[question.key].answer, 'answer')}
+        ${more}
       </div>
-      <div class="push-end"><button type="button" class="text-button" data-action="previous-question">${ctx.t(UI.back)}</button></div>
     </section>
     <aside class="foot-pane">
-      <div class="why" data-key="why-${key}"><b>${ctx.t(UI.whyWeAsk)}</b><p>${ctx.t(copy.why)}</p></div>
-      <h2 class="pane-title">${ctx.t(UI.answers)}</h2>
+      <div class="why" data-key="why-${question.key}"><b>${l.whyWeAsk}</b><p>${copy.why}</p></div>
+      <h2 class="pane-title">${l.yourAnswers}</h2>
       <ul class="answer-list">${answerList}</ul>
     </aside>`;
 }

@@ -1,0 +1,584 @@
+/*
+ * The volunteer and pilgrim steps added with the action categories (ADR-0004): card scan, exam, handover,
+ * Yes / No / Not sure answers with a foot side, and the urgent and incomplete categories.
+ */
+
+/* Answers: three equal buttons. The pilgrim's are big; the volunteer's exam rows are compact. */
+.answers-large .btn {
+  min-height: 120px;
+  padding-inline: 18px;
+  font-size: 32px;
+}
+
+.answers-compact {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.answers-compact .btn {
+  flex: 1 1 0;
+  min-height: 60px;
+  padding-inline: 10px;
+  font-size: 18px;
+}
+
+.answer-unsure[aria-pressed='true'] {
+  background: var(--text-muted);
+}
+
+.side-picker {
+  display: flex;
+  gap: 6px;
+}
+
+.side-choice {
+  flex: 1 1 0;
+  min-height: 60px;
+  padding-inline: 10px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--primary-strong);
+  box-shadow: inset 0 0 0 2px var(--line);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.side-choice[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: none;
+}
+
+/* Questions: the side and follow-up appear under the answer after a "yes". */
+.q-card {
+  gap: 22px;
+}
+
+.q-card .k-h2 {
+  font-size: 32px;
+}
+
+.q-extra {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  animation: rise-in 360ms var(--ease-out) both;
+}
+
+.q-extra b {
+  font-size: 20px;
+  color: var(--primary-strong);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Card scan */
+.card-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.card-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--k-small);
+  color: var(--text-muted);
+}
+
+.card-field input {
+  min-height: 56px;
+  padding-inline: 16px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line);
+  color: var(--text);
+  font: inherit;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+}
+
+.card-field input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.sample-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sample-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.sample-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line);
+  color: var(--text);
+  text-align: start;
+}
+
+.sample-card:hover {
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.sample-card svg {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  color: var(--primary);
+}
+
+.sample-card span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sample-card b {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sample-card small {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Who is being screened (staff screens). */
+.profile-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 17px;
+  color: var(--text-muted);
+}
+
+.profile-strip b {
+  font-size: 19px;
+  color: var(--text);
+}
+
+.profile-strip svg {
+  width: 24px;
+  height: 24px;
+  color: var(--primary);
+}
+
+/* Exam: inspection on the main sheet, sensation, circulation and urgent signs on the side sheet. */
+.exam,
+.exam-pane {
+  gap: 8px;
+  padding-block: 22px 0;
+}
+
+.exam .k-h2 {
+  font-size: 30px;
+}
+
+.exam > .note {
+  margin: 0;
+  font-size: 15px;
+}
+
+.exam-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exam-group .pane-title {
+  margin: 0;
+}
+
+.exam-group > .note {
+  margin: 0;
+  font-size: 15px;
+}
+
+.exam-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exam-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  align-items: center;
+  gap: 4px 12px;
+  padding: 3px 10px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.exam-item .answers-compact .btn {
+  font-size: 16px;
+  padding-inline: 6px;
+}
+
+.exam-item.is-yes {
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+.exam-label {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.exam-item .side-picker {
+  grid-column: 2;
+}
+
+.exam-urgent .exam-item.is-yes {
+  background: var(--error-tint);
+  box-shadow: inset 0 0 0 2px var(--error);
+}
+
+.exam-essential .pane-title::after {
+  content: ' *';
+  color: var(--error);
+}
+
+.exam-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  margin-block-start: auto;
+  padding-block: 12px 22px;
+  background: var(--surface-raised);
+}
+
+.exam-footer .note.is-missing {
+  color: var(--warning-ink);
+  font-weight: 500;
+}
+
+.btn-urgent {
+  background: var(--error);
+  color: var(--on-primary);
+}
+
+/* Handover: the pilgrim picks a language. */
+.lang-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lang-choice {
+  min-height: 60px;
+  padding-inline: 10px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--line);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 21px;
+}
+
+.lang-choice[aria-pressed='true'] {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.draft-note {
+  color: var(--warning-ink);
+}
+
+/* Result: urgent is the solid alarm colour; incomplete is neutral, so it never reads as "fine". */
+.risk-urgent {
+  background: var(--error);
+  color: var(--on-primary);
+}
+
+.risk-urgent .verdict > svg,
+.risk-urgent .k-h1,
+.risk-urgent .k-heading .second,
+.risk-urgent .recommendations svg,
+.risk-urgent .band-footer p {
+  color: var(--on-primary);
+}
+
+.risk-urgent .referral {
+  background: var(--surface-raised);
+  color: var(--error-ink);
+}
+
+.risk-incomplete {
+  background: var(--surface);
+}
+
+.risk-incomplete .verdict > svg,
+.risk-incomplete .k-h1 {
+  color: var(--text-muted);
+}
+
+.level-urgent {
+  background: var(--error);
+  color: var(--on-primary);
+}
+
+.level-incomplete {
+  background: var(--surface);
+  color: var(--text-muted);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.level-dot.level-urgent {
+  background: var(--error-ink);
+}
+
+.level-dot.level-incomplete {
+  background: var(--text-muted);
+}
+
+/* Clinical report: what the volunteer must do now. */
+.action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border-inline-start: 6px solid var(--success);
+  background: var(--success-tint);
+}
+
+.action-card b {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.action-card p {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.action-card small {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.action-moderate {
+  border-color: var(--warning);
+  background: var(--warning-tint);
+}
+
+.action-high {
+  border-color: var(--error);
+  background: var(--error-tint);
+}
+
+.action-urgent {
+  border-color: var(--error-ink);
+  background: var(--error-tint);
+}
+
+.action-incomplete {
+  border-color: var(--text-muted);
+  background: var(--surface);
+}
+
+.rule-list li {
+  flex-wrap: wrap;
+}
+
+.rule-source {
+  flex-basis: 100%;
+  padding-inline-start: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.answer-grid li.is-unsure b {
+  color: var(--warning-ink);
+}
+
+.answer-grid li.is-missing b {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Reflowed (narrow) adjustments */
+.stage.reflow .exam-item {
+  grid-template-columns: 1fr;
+}
+
+.stage.reflow .exam-item .side-picker {
+  grid-column: 1;
+}
+
+.stage.reflow .sample-grid,
+.stage.reflow .lang-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stage.reflow .card-form {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Five steps in the top bar: tighter, on one line, so long translations still fit beside the badge. */
+.rail li {
+  padding-inline: 8px;
+  white-space: nowrap;
+}
+
+.rail li + li::before {
+  width: 14px;
+}
+
+.sim-badge {
+  flex: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Questions: Back sits beside the count, and a "yes" with extras gets a tighter card so Next stays on screen. */
+.q-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.q-count-row .text-button {
+  min-height: 40px;
+  padding-block: 4px;
+}
+
+.q-card.has-extras {
+  gap: 14px;
+}
+
+.q-card.has-extras .answers-large .btn {
+  min-height: 88px;
+  font-size: 28px;
+}
+
+.q-extras {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 10px;
+}
+
+.q-extras .q-extra {
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.q-extras .q-extra b {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.q-extras .answers-compact .btn,
+.q-extras .side-choice {
+  font-size: 16px;
+  padding-inline: 6px;
+}
+
+/* Handover: the pilgrim's language grid gets the side sheet; a small foot outline fills the space above Start. */
+.handover-feet {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.handover-feet .feet svg {
+  max-height: 230px;
+}
+
+.handover-pane {
+  justify-content: center;
+  gap: 16px;
+}
+
+.handover-pane .lang-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Ten answers in the side list: tighter rows so they fit without scrolling. */
+.answer-list li {
+  padding-block: 6px;
+  font-size: 18px;
+}
+
+.guide.scan {
+  gap: 16px;
+}
+
+.q-card.has-extras .k-h2 {
+  font-size: 26px;
+}
+
+.q-card.has-extras .k-h2 .second {
+  font-size: 17px;
+}
+
+/* Result: four recommendations in a long language still leave room for the QR footer. */
+.risk-band {
+  gap: 12px;
+  padding-block: 28px;
+}
+
+.risk-band .recommendations li {
+  font-size: 18px;
+}
+
+.risk-band .band-footer p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.risk-band .qr {
+  width: 96px;
+  height: 96px;
+}

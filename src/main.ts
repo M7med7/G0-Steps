@@ -3,6 +3,7 @@ import './styles/base.css';
 import './styles/demo-panel.css';
 import './styles/kiosk.css';
 import './styles/screens.css';
+import './styles/flow.css';
 
 import { AppController } from './controllers/AppController';
 import { browserCalibrationStorage } from './controllers/calibrationStorage';

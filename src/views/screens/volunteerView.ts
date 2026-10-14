@@ -1,23 +1,25 @@
-import { PILGRIM_LANGUAGES, RISK_LEVELS, UI, ZONE_NAMES } from '../../i18n/copy';
+import { CATEGORY_COPY, UI } from '../../i18n/copy';
+import { LOCALE_META } from '../../i18n/locales';
 import { summarize, type ScreeningRecord } from '../../models/screeningLog';
 import { bilingualHeading } from '../components/heading';
 import type { ViewContext } from '../context';
 import { escapeHtml } from '../html';
-import { RISK_ICONS } from '../icons';
+import { CATEGORY_ICONS } from '../icons';
 
 function row(ctx: ViewContext, record: ScreeningRecord): string {
   const separator = ctx.language === 'ar' ? '، ' : ', ';
   const areas = record.zones.length
-    ? record.zones.map(({ foot, zone }) => `${ctx.t(ZONE_NAMES[zone])} (${ctx.t(foot === 'L' ? UI.leftShort : UI.rightShort)})`).join(separator)
+    ? record.zones.map(({ foot, zone }) => `${ctx.l.zones[zone]} (${foot === 'L' ? ctx.l.leftShort : ctx.l.rightShort})`).join(separator)
     : '—';
   const currentChip = record.isCurrent ? ` <span class="chip chip-yes">${ctx.t(UI.thisScreening)}</span>` : '';
+  const language = LOCALE_META[record.language];
   return `<tr class="${record.isCurrent ? 'current' : ''}">
       <td class="num">${escapeHtml(record.time)}</td>
       <td class="num">${escapeHtml(record.id)}${currentChip}</td>
-      <td>${ctx.t(PILGRIM_LANGUAGES[record.language])}</td>
-      <td><span class="level-pill level-${record.level}">${RISK_ICONS[record.level]}${ctx.t(RISK_LEVELS[record.level].title)}</span></td>
+      <td lang="${record.language}" dir="${language.dir}">${language.nativeName}</td>
+      <td><span class="level-pill level-${record.category}">${CATEGORY_ICONS[record.category]}${ctx.t(CATEGORY_COPY[record.category].title)}</span></td>
       <td>${areas}</td>
-      <td class="${record.referred ? 'referred' : ''}">${ctx.t(record.referred ? UI.yes : UI.no)}</td>
+      <td class="${record.referred ? 'referred' : ''}">${record.referred ? ctx.l.yes : ctx.l.no}</td>
     </tr>`;
 }
 
@@ -27,7 +29,7 @@ export function renderVolunteer(ctx: ViewContext, log: readonly ScreeningRecord[
       ${bilingualHeading(ctx, UI.todaysScreenings, 'h2')}
       <div class="stats">
         <div><b>${summary.screened}</b><span>${ctx.t(UI.screened)}</span></div>
-        <div><b class="stat-high">${summary.highRisk}</b><span>${ctx.t(UI.highRisk)}</span></div>
+        <div><b class="stat-high">${summary.highConcern}</b><span>${ctx.t(UI.highConcern)}</span></div>
         <div><b>${summary.referred}</b><span>${ctx.t(UI.referred)}</span></div>
       </div>
       <div class="table-wrap"><table>

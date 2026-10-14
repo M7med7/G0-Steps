@@ -1,8 +1,7 @@
 import * as QRCode from 'qrcode';
-import { directionOf } from '../i18n/translate';
 import { selectResult, type AppState } from '../models/ScreeningStore';
 import { buildScreeningLog } from '../models/screeningLog';
-import type { RiskResult, ScreenName } from '../models/types';
+import type { ScreeningResult, ScreenName } from '../models/types';
 import { renderTopBar } from './components/topBar';
 import { createViewContext, type ViewContext } from './context';
 import { morphChildren } from './morph';
@@ -10,7 +9,9 @@ import { renderQuestions } from './screens/questionsView';
 import { renderDoctor } from './screens/doctorView';
 import { qrPayload, renderResult } from './screens/resultView';
 import { renderScan } from './screens/scanView';
-import { renderStart } from './screens/startView';
+import { renderExam } from './screens/examView';
+import { renderHandover } from './screens/handoverView';
+import { renderIdentify } from './screens/identifyView';
 import { renderVolunteer } from './screens/volunteerView';
 
 const DESIGN_WIDTH = 1280;
@@ -37,40 +38,47 @@ export class KioskView {
     const ctx = createViewContext(state);
     const result = selectResult(state);
 
-    this.el.kiosk.setAttribute('lang', state.language);
-    this.el.kiosk.setAttribute('dir', directionOf(state.language));
+    this.el.kiosk.setAttribute('lang', ctx.locale);
+    this.el.kiosk.setAttribute('dir', ctx.dir);
     this.el.kiosk.dataset['screen'] = state.screen;
     morphChildren(this.el.top, renderTopBar(ctx));
     // A new screen is drawn fresh so its enter animation plays; updates within a screen only patch what changed,
     // which keeps the scan animations running instead of restarting on every progress tick.
     const body = this.renderScreen(ctx, result);
-    if (state.screen !== this.shownScreen) this.el.body.innerHTML = body;
+    const isNewScreen = state.screen !== this.shownScreen;
+    if (isNewScreen) this.el.body.innerHTML = body;
     else morphChildren(this.el.body, body);
     this.shownScreen = state.screen;
+    // The card field takes the barcode scanner's keystrokes, so it needs focus as soon as the screen opens.
+    if (isNewScreen) this.el.body.querySelector<HTMLElement>('[autofocus]')?.focus();
 
     if (state.screen === 'result' && result) void this.drawQr(result);
     this.fit();
   }
 
-  private renderScreen(ctx: ViewContext, result: RiskResult | null): string {
+  private renderScreen(ctx: ViewContext, result: ScreeningResult | null): string {
     switch (ctx.state.screen) {
-      case 'start':
-        return renderStart(ctx);
+      case 'identify':
+        return renderIdentify(ctx);
+      case 'exam':
+        return renderExam(ctx);
+      case 'handover':
+        return renderHandover(ctx);
       case 'questions':
         return renderQuestions(ctx);
       case 'scan':
         return renderScan(ctx);
       case 'result':
-        // Until readings arrive the result screen shows the scan in progress.
+        // Until readings arrive the result screen shows the scan in progress (unless testing stopped for an urgent finding).
         return result ? renderResult(ctx, result) : renderScan(ctx);
       case 'doctor':
         return result ? renderDoctor(ctx, result) : renderScan(ctx);
       case 'volunteer':
-        return renderVolunteer(ctx, buildScreeningLog(result, ctx.language));
+        return renderVolunteer(ctx, buildScreeningLog(result, ctx.state.locale));
     }
   }
 
-  private async drawQr(result: RiskResult): Promise<void> {
+  private async drawQr(result: ScreeningResult): Promise<void> {
     const canvas = this.el.body.querySelector<HTMLCanvasElement>('canvas[data-qr]');
     if (!canvas) return;
     const ink = getComputedStyle(this.el.kiosk).getPropertyValue('--text').trim() || '#13262A';

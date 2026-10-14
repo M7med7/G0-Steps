@@ -1,5 +1,5 @@
 import logoUrl from '../../assets/logo.webp';
-import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../../i18n/copy';
+import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../../i18n/deviceCopy';
 import { translate, type Bilingual } from '../../i18n/translate';
 import { DEVICE_LAYERS, LAYER_PARTS, layerNumber, type DeviceSelection, type DeviceViewState } from '../../models/deviceLayers';
 import { ICONS } from '../icons';

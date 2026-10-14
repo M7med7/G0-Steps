@@ -1,4 +1,4 @@
-import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../i18n/copy';
+import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../i18n/deviceCopy';
 import { directionOf, otherLanguage, translate } from '../i18n/translate';
 import {
   DEVICE_LAYERS,

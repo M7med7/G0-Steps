@@ -1,7 +1,8 @@
 import logoUrl from '../assets/logo.webp';
+import { LOCALE_META } from '../i18n/locales';
 import { SENSOR_ORDER } from '../models/pressureProtocol';
 import type { AppState } from '../models/ScreeningStore';
-import { SCENARIO_NAMES, SCREENS, SENSOR_MODES, type DeviceStatus, type Language, type ScenarioName, type ScreenName, type SensorMode } from '../models/types';
+import { LOCALES, SCENARIO_NAMES, SCREENS, SENSOR_MODES, type DeviceStatus, type Language, type ScenarioName, type ScreenName, type SensorMode } from '../models/types';
 import { morphChildren } from './morph';
 
 /*
@@ -10,14 +11,16 @@ import { morphChildren } from './morph';
  */
 
 const SCREEN_LABELS: Readonly<Record<ScreenName, string>> = {
-  start: 'Start',
+  identify: 'Card scan',
+  exam: 'Volunteer exam',
+  handover: 'Handover',
   questions: 'Questions',
   scan: 'Scan',
   result: 'Pilgrim result',
-  doctor: 'Doctor view',
+  doctor: 'Clinical report',
   volunteer: 'Volunteer list',
 };
-const SCENARIO_LABELS: Readonly<Record<ScenarioName, string>> = { low: 'Low', moderate: 'Moderate', high: 'High' };
+const SCENARIO_LABELS: Readonly<Record<ScenarioName, string>> = { low: 'Low', moderate: 'Moderate', high: 'High', urgent: 'Urgent' };
 const LANGUAGE_LABELS: Readonly<Record<Language, string>> = { ar: 'العربية', en: 'English' };
 const MODE_LABELS: Readonly<Record<SensorMode, string>> = { preset: 'Preset', fakeDevice: 'Fake ESP32', esp32: 'ESP32 (USB)' };
 const MODE_HINTS: Readonly<Record<SensorMode, string>> = {
@@ -100,10 +103,11 @@ function drawer(state: AppState): string {
   const screens = SCREENS.map((s) => ({ value: s, label: SCREEN_LABELS[s] }));
   const scenarios = SCENARIO_NAMES.map((s) => ({ value: s, label: `<span class="dot dot-${s}"></span>${SCENARIO_LABELS[s]}` }));
   const languages = (['ar', 'en'] as const).map((l) => ({ value: l, label: LANGUAGE_LABELS[l] }));
+  const pilgrimLanguages = LOCALES.map((l) => ({ value: l, label: LOCALE_META[l].nativeName }));
   const modes = SENSOR_MODES.map((m) => ({ value: m, label: MODE_LABELS[m] }));
   return `<header class="demo-head">
       <img src="${logoUrl}" alt="" width="34" height="36">
-      <div><strong>Demo controls</strong><span>For the team. Pilgrims never see this.</span></div>
+      <div><strong>Demo controls</strong><span>For the team. Pilgrims never see this. Scenarios fill the exam and answers.</span></div>
       <button type="button" class="demo-close" data-action="close-demo" aria-label="Close demo controls">${ICON_CLOSE}</button>
     </header>
     <div class="demo-body">
@@ -112,7 +116,8 @@ function drawer(state: AppState): string {
       ${choices('Sensor source', 'set-sensor-mode', 'mode', modes, state.sensorMode)}
       <p class="demo-hint">${MODE_HINTS[state.sensorMode]}</p>
       ${platform(state)}
-      ${choices('Language', 'set-language', 'language', languages, state.language)}
+      ${choices('Staff language', 'set-language', 'language', languages, state.language)}
+      ${choices('Pilgrim language', 'set-locale', 'locale', pilgrimLanguages, state.locale)}
     </div>`;
 }
 

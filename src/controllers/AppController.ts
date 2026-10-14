@@ -1,11 +1,16 @@
 import { DEFAULT_CALIBRATION, toPressureMap, withReference, withZero, type Calibration, type RawFrame } from '../models/pressureProtocol';
-import { isScanComplete, SENSOR_COUNT, usesDevice, type AppState, type ScreeningStore } from '../models/ScreeningStore';
+import { lookUpCard } from '../models/pilgrimCards';
+import { isExamKey } from '../models/questions';
+import { isScanComplete, isTestingStopped, SENSOR_COUNT, usesDevice, type AppState, type ScreeningStore } from '../models/ScreeningStore';
 import {
+  isAnswer,
   isCalibrationStep,
   isLanguage,
+  isLocale,
   isScenarioName,
   isScreenName,
   isSensorMode,
+  isSide,
   type CalibrationStep,
   type ScenarioName,
   type SensorMode,
@@ -64,6 +69,7 @@ export class AppController {
     const { store, router } = this.deps;
     store.subscribe((state) => this.onStateChange(state));
     root.addEventListener('click', (event) => this.onClick(event));
+    root.addEventListener('submit', (event) => this.onSubmit(event));
     root.addEventListener('keydown', (event) => {
       if (event instanceof KeyboardEvent && event.key === 'Escape' && store.getState().demoOpen) store.setDemoOpen(false);
     });
@@ -74,12 +80,12 @@ export class AppController {
     });
 
     const linked = router.read();
-    if (linked && linked !== 'start') this.openFromLink(linked);
+    if (linked && linked !== 'identify') this.openFromLink(linked);
     else this.onStateChange(store.getState());
   }
 
   private openFromLink(screen: AppState['screen']): void {
-    this.deps.store.markAllAnswered();
+    this.deps.store.fillFromScenario();
     this.deps.store.goTo(screen);
   }
 
@@ -100,6 +106,8 @@ export class AppController {
       return;
     }
     if (state.readings || state.sensorError || this.readInFlight) return;
+    // An urgent finding stops routine device testing: the report opens without a scan.
+    if (onResult && isTestingStopped(state)) return;
     if (state.screen === 'scan') void this.readSensors(state, true);
     if (onResult) void this.readSensors(state, false);
   }
@@ -278,6 +286,21 @@ export class AppController {
 
   // ------------------------------------------------------------ input
 
+  /** The card form: a barcode scanner types the code and presses Enter, which submits it. */
+  private onSubmit(event: Event): void {
+    const form = event.target;
+    if (!(form instanceof HTMLFormElement) || form.dataset['action'] !== 'card-scan') return;
+    event.preventDefault();
+    const field = form.elements.namedItem('card');
+    const code = field instanceof HTMLInputElement ? field.value : '';
+    const lookup = lookUpCard(code);
+    if (lookup.ok) this.deps.store.identify(lookup.profile);
+    else {
+      this.deps.store.setCardError(lookup.reason);
+      if (field instanceof HTMLInputElement) field.select();
+    }
+  }
+
   private onClick(event: Event): void {
     const target = event.target;
     if (!(target instanceof Element)) return;
@@ -285,14 +308,47 @@ export class AppController {
     if (!button) return;
 
     const { store } = this.deps;
-    const { action, screen, scenario, language, value, mode, step } = button.dataset;
+    const { action, screen, scenario, language, locale, value, mode, step, item, side } = button.dataset;
 
     switch (action) {
-      case 'begin':
-        if (isLanguage(language)) store.beginScreening(language);
+      case 'new-screening':
+        this.cancelRead();
+        store.newScreening();
+        break;
+      case 'sample-card': {
+        const lookup = lookUpCard(button.dataset['card'] ?? '');
+        if (lookup.ok) store.identify(lookup.profile);
+        break;
+      }
+      case 'no-card':
+        store.identify(null);
+        break;
+      case 'exam-answer':
+        if (isExamKey(item) && isAnswer(value)) store.setExamAnswer(item, value);
+        break;
+      case 'exam-side':
+        if (isExamKey(item) && isSide(side)) store.setExamSide(item, side);
+        break;
+      case 'finish-exam':
+        store.finishExam();
+        break;
+      case 'set-locale':
+        if (isLocale(locale)) store.setLocale(locale);
+        break;
+      case 'start-questions':
+        store.goTo('questions');
         break;
       case 'answer':
-        if (value === 'yes' || value === 'no') store.answerCurrent(value === 'yes');
+        if (isAnswer(value)) store.answerQuestion(value);
+        break;
+      case 'question-side':
+        if (isSide(side)) store.setQuestionSide(side);
+        break;
+      case 'follow-up':
+        if (isAnswer(value)) store.answerFollowUp(value);
+        break;
+      case 'next-question':
+        store.nextQuestion();
         break;
       case 'previous-question':
         store.previousQuestion();

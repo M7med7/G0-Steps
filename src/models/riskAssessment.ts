@@ -1,15 +1,26 @@
 import {
   ASYMMETRY_GAP,
+  CATEGORY_RANK,
   HIGH_LOAD,
   MAX_RECOMMENDATIONS,
   RAISED_LOAD,
   RECOMMENDATION_PRIORITY,
   RULES,
+  type RuleInput,
   type ZoneFindings,
 } from './rules';
-import { FEET, ZONES, type Foot, type PressureMap, type RiskAnswers, type RiskLevel, type RiskResult, type ZoneFlag, type ZoneState } from './types';
-
-const LEVEL_RANK: Readonly<Record<RiskLevel, number>> = { low: 0, moderate: 1, high: 2 };
+import {
+  FEET,
+  ZONES,
+  type ActionCategory,
+  type ExamFindings,
+  type Foot,
+  type PressureMap,
+  type RiskAnswers,
+  type ScreeningResult,
+  type ZoneFlag,
+  type ZoneState,
+} from './types';
 
 const otherFoot = (foot: Foot): Foot => (foot === 'L' ? 'R' : 'L');
 
@@ -39,21 +50,42 @@ export function findZoneFlags(pressure: PressureMap): ZoneFindings {
   };
 }
 
-/** Pure: same answers and pressure always give the same result. */
-export function assessRisk(answers: RiskAnswers, pressure: PressureMap): RiskResult {
-  const findings = findZoneFlags(pressure);
-  const fired = RULES.filter((rule) => rule.when(answers, findings));
+const ruleInput = (answers: RiskAnswers, exam: ExamFindings, pressure: PressureMap | null): RuleInput => ({
+  answers,
+  exam,
+  pressure: pressure ? findZoneFlags(pressure) : null,
+});
 
-  const level = fired.reduce<RiskLevel>(
-    (highest, rule) => (LEVEL_RANK[rule.level] > LEVEL_RANK[highest] ? rule.level : highest),
+/** True when the questions or exam already show an urgent finding, so routine device testing stops. */
+export function hasUrgentFinding(answers: RiskAnswers, exam: ExamFindings): boolean {
+  const input = ruleInput(answers, exam, null);
+  return RULES.some((rule) => rule.category === 'urgent' && rule.when(input));
+}
+
+/**
+ * Pure: the same answers, exam and pressure always give the same result.
+ * `pressure` is null when there is no reading; that alone makes the assessment incomplete unless something outranks it.
+ */
+export function assessScreening(answers: RiskAnswers, exam: ExamFindings, pressure: PressureMap | null): ScreeningResult {
+  const input = ruleInput(answers, exam, pressure);
+  const fired = RULES.filter((rule) => rule.when(input));
+
+  const category = fired.reduce<ActionCategory>(
+    (highest, rule) => (CATEGORY_RANK[rule.category] > CATEGORY_RANK[highest] ? rule.category : highest),
     'low',
   );
   const suggested = new Set(fired.flatMap((rule) => rule.recommendations));
+  // An urgent case goes to a clinician now; "today" and "finish the check" would only contradict that.
+  if (category === 'urgent') {
+    suggested.delete('seeMedicalToday');
+    suggested.delete('completeCheck');
+  }
 
   return {
-    level,
-    refer: fired.some((rule) => rule.refer),
-    zoneFlags: findings.flags,
+    category,
+    refer: category === 'urgent' || category === 'high',
+    stopTesting: category === 'urgent',
+    zoneFlags: input.pressure?.flags ?? [],
     recommendations: RECOMMENDATION_PRIORITY.filter((key) => suggested.has(key)).slice(0, MAX_RECOMMENDATIONS),
     firedRules: fired.map((rule) => rule.id),
   };

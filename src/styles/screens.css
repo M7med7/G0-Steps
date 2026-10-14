@@ -332,50 +332,6 @@
   font-weight: 500;
 }
 
-/* Start */
-.how-steps {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.how-steps li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px 8px 8px;
-  border-radius: 999px;
-  background: var(--surface);
-  font-size: 19px;
-  font-weight: 500;
-  color: var(--primary-strong);
-  animation: rise-in 500ms var(--ease-out) both;
-  animation-delay: calc(250ms + var(--i) * 110ms);
-}
-
-.kiosk[dir='rtl'] .how-steps li {
-  padding: 8px 8px 8px 16px;
-}
-
-.how-steps i {
-  width: 32px;
-  height: 32px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-size: 16px;
-  font-style: normal;
-}
-
-.start-actions .btn-primary {
-  flex: 1 1 auto;
-}
-
 /* Questions */
 .q-head {
   display: flex;

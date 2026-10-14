@@ -1,4 +1,5 @@
 import type { Language } from '../models/types';
+import { fill } from './fill';
 
 export interface Bilingual {
   readonly ar: string;
@@ -11,5 +12,5 @@ export const directionOf = (language: Language): 'rtl' | 'ltr' => (language === 
 
 /** Picks one language and fills {placeholders}. */
 export function translate(text: Bilingual, language: Language, vars: Readonly<Record<string, string | number>> = {}): string {
-  return text[language].replace(/\{(\w+)\}/g, (match, key: string) => (key in vars ? String(vars[key]) : match));
+  return fill(text[language], vars);
 }

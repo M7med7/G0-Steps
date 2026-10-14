@@ -33,8 +33,9 @@
   --error-tint: #f8e1de;
   --error-ink: #7e1a14;
 
-  --font-display: 'Alexandria', 'Readex Pro', 'Segoe UI', Tahoma, sans-serif;
-  --font-body: 'Readex Pro', 'Segoe UI', Tahoma, sans-serif;
+  /* Noto fills in the scripts Alexandria and Readex Pro don't cover: Cyrillic, Bengali and Devanagari. */
+  --font-display: 'Alexandria', 'Readex Pro', 'Noto Sans', 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Segoe UI', Tahoma, sans-serif;
+  --font-body: 'Readex Pro', 'Noto Sans', 'Noto Sans Bengali', 'Noto Sans Devanagari', 'Segoe UI', Tahoma, sans-serif;
 
   /* Kiosk type scale, in screen pixels at 1280×800. */
   --k-h1: 54px;

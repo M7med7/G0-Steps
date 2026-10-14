@@ -1,4 +1,3 @@
-import { UI } from '../../i18n/copy';
 import { zoneState } from '../../models/riskAssessment';
 import { SENSOR_COUNT } from '../../models/ScreeningStore';
 import { FEET, ZONES, type Foot, type PressureMap, type Zone } from '../../models/types';
@@ -56,11 +55,11 @@ export function renderFootMap(ctx: ViewContext, mode: FootMapMode, pressure: Pre
   const scanning = isScanning(mode);
   const state = scanning ? 'is-scanning' : mode.kind === 'final' || (mode.kind === 'scanning' && pressure) ? 'is-complete' : `is-${mode.kind}`;
   return `<div class="feet ${state}">
-    <svg viewBox="0 0 440 500" role="img" aria-label="${ctx.t(UI.footMapLabel)}">
+    <svg viewBox="0 0 440 500" role="img" aria-label="${ctx.l.footMapLabel}">
       <g transform="translate(200 0) scale(-1 1)">${oneFoot('L', mode, pressure)}</g>
       <g transform="translate(240 0)">${oneFoot('R', mode, pressure)}</g>
-      <text class="foot-label" x="100" y="492">${ctx.t(UI.leftShort)}</text>
-      <text class="foot-label" x="340" y="492">${ctx.t(UI.rightShort)}</text>
+      <text class="foot-label" x="100" y="492">${ctx.l.leftShort}</text>
+      <text class="foot-label" x="340" y="492">${ctx.l.rightShort}</text>
     </svg>
     <div class="scan-beam" aria-hidden="true"></div>
   </div>`;
@@ -68,8 +67,8 @@ export function renderFootMap(ctx: ViewContext, mode: FootMapMode, pressure: Pre
 
 export function renderLegend(ctx: ViewContext): string {
   return `<ul class="legend">
-    <li><span class="swatch swatch-normal"></span>${ctx.t(UI.legendNormal)}</li>
-    <li><span class="swatch swatch-raised"></span>${ctx.t(UI.legendRaised)}</li>
-    <li><span class="swatch swatch-high"></span>${ctx.t(UI.legendHigh)}</li>
+    <li><span class="swatch swatch-normal"></span>${ctx.l.legendNormal}</li>
+    <li><span class="swatch swatch-raised"></span>${ctx.l.legendRaised}</li>
+    <li><span class="swatch swatch-high"></span>${ctx.l.legendHigh}</li>
   </ul>`;
 }

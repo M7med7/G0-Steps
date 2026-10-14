@@ -1,104 +1,88 @@
-import type { DeviceLayerId, DevicePartId } from '../models/deviceLayers';
-import type { PilgrimLanguage } from '../models/screeningLog';
-import type { AnswerKey, FlagReason, RecommendationKey, RiskLevel, SensorErrorReason, Zone } from '../models/types';
+import type { ExamGroup } from '../models/questions';
+import type { ActionCategory, ExamKey, Sex } from '../models/types';
 import type { Bilingual } from './translate';
 
+/*
+ * Staff-facing copy: the card scan, the volunteer's exam, the clinical report and the volunteer list.
+ * Staff read Arabic or English. Everything a pilgrim reads lives in i18n/locales in every pilgrim language.
+ */
+
 export const UI = {
-  brandSub: { ar: 'محطة الفحص الوقائي للقدم', en: 'Preventive foot screening' },
   simulated: { ar: 'بيانات تجريبية', en: 'Simulated data' },
-  stepStart: { ar: 'البداية', en: 'Start' },
-  stepQuestions: { ar: 'الأسئلة', en: 'Questions' },
-  stepScan: { ar: 'الفحص', en: 'Scan' },
-  stepResult: { ar: 'النتيجة', en: 'Result' },
-
-  startTitle: { ar: 'فحص القدم الوقائي', en: 'Preventive foot check' },
-  startLede: {
-    ar: 'فحص سريع لمدة دقيقة يكشف مناطق الخطر في قدميك قبل أن تتحول إلى إصابة.',
-    en: 'A one-minute check that finds risk areas on your feet before they become an injury.',
-  },
-  startVolunteer: {
-    ar: 'للمرشد: اطلب من الحاج خلع الحذاء والجوارب والجلوس قليلًا قبل الفحص.',
-    en: 'Volunteer: ask the pilgrim to take off shoes and socks and sit briefly before the scan.',
-  },
-  startFootHint: { ar: 'ستقف على المنصة بعد ستة أسئلة قصيرة', en: 'You will stand on the platform after six short questions' },
-
-  questionCount: { ar: 'سؤال {n} من {total}', en: 'Question {n} of {total}' },
-  yes: { ar: 'نعم', en: 'Yes' },
-  no: { ar: 'لا', en: 'No' },
-  back: { ar: 'رجوع', en: 'Back' },
-  whyWeAsk: { ar: 'لماذا نسأل؟', en: 'Why we ask' },
-  answers: { ar: 'الإجابات', en: 'Answers' },
-
-  scanTitle: { ar: 'قف بثبات على المنصة', en: 'Stand still on the platform' },
-  scanLede: {
-    ar: 'ضع كل قدم على العلامة المرسومة ولا تتحرك حتى يكتمل الفحص.',
-    en: 'Place each foot on its outline and keep still until the scan finishes.',
-  },
-  scanReading: { ar: 'جارٍ قراءة المستشعرات… {k} من {total}', en: 'Reading sensors… {k} of {total}' },
-  scanComplete: { ar: 'اكتمل الفحص', en: 'Scan complete' },
-  sensorPressure: { ar: 'ضغط القدم · 8 مستشعرات', en: 'Foot pressure · 8 sensors' },
-  sensorThermal: { ar: 'التصوير الحراري', en: 'Thermal camera' },
-  sensorCamera: { ar: 'الكاميرا', en: 'Foot camera' },
-  notConnected: { ar: 'غير متصل في النموذج', en: 'Not connected in prototype' },
-  showResult: { ar: 'عرض النتيجة', en: 'Show result' },
-  skipWait: { ar: 'تخطي الانتظار', en: 'Skip wait' },
-  sensorError: {
-    ar: 'تعذّرت قراءة المستشعرات. تأكد من توصيل المنصة ثم أعد المحاولة.',
-    en: "Couldn't read the sensors. Check the platform connection and try again.",
-  },
-  retry: { ar: 'أعد المحاولة', en: 'Try again' },
-
-  referral: { ar: 'تحويل: رافق الحاج إلى النقطة الطبية', en: 'Referral: guide the pilgrim to the medical point' },
-  qrNote: { ar: 'امسح الرمز لحفظ نتيجتك. لا يحتوي على أي بيانات شخصية.', en: 'Scan to keep your result. It holds no personal data.' },
-  qrLabel: { ar: 'رمز النتيجة', en: 'Result QR code' },
-  illustrativeRules: { ar: 'قواعد توضيحية غير معتمدة سريريًا', en: 'Illustrative rules, not clinically validated' },
-  nextPilgrim: { ar: 'حاج جديد', en: 'Next pilgrim' },
-  volunteerList: { ar: 'قائمة المرشد', en: 'Volunteer list' },
-  markedAreas: { ar: 'المناطق المحددة', en: 'Marked areas' },
-  noMarkedAreas: { ar: 'لا توجد مناطق ضغط مرتفع', en: 'No high-pressure areas' },
-  footMapLabel: { ar: 'خريطة ضغط القدمين', en: 'Foot pressure map' },
-  legendNormal: { ar: 'طبيعي', en: 'Normal' },
-  legendRaised: { ar: 'ضغط مرتفع', en: 'Raised pressure' },
-  legendHigh: { ar: 'ضغط مرتفع جدًا', en: 'High pressure' },
-
-  todaysScreenings: { ar: 'فحوصات اليوم', en: "Today's screenings" },
-  screened: { ar: 'تم فحصهم', en: 'screened' },
-  highRisk: { ar: 'خطر مرتفع', en: 'high risk' },
-  referred: { ar: 'تم تحويلهم', en: 'referred' },
-  colTime: { ar: 'الوقت', en: 'Time' },
-  colScreening: { ar: 'رقم الفحص', en: 'Screening' },
-  colLanguage: { ar: 'لغة الحاج', en: 'Language' },
-  colResult: { ar: 'النتيجة', en: 'Result' },
-  colAreas: { ar: 'المناطق المحددة', en: 'Marked areas' },
-  colReferral: { ar: 'تحويل', en: 'Referral' },
-  thisScreening: { ar: 'هذا الفحص', en: 'This screening' },
-  leftFoot: { ar: 'القدم اليسرى', en: 'Left foot' },
-  rightFoot: { ar: 'القدم اليمنى', en: 'Right foot' },
-  leftShort: { ar: 'يسار', en: 'Left' },
-  rightShort: { ar: 'يمين', en: 'Right' },
-
   liveSensors: { ar: 'مستشعرات حية', en: 'Live sensors' },
-  station3d: { ar: 'المحطة ثلاثية الأبعاد', en: 'Station in 3D' },
-  exploreStation: { ar: 'استكشف مكونات المحطة', en: 'Explore inside the station' },
   platformOffline: { ar: 'المنصة غير متصلة', en: 'Platform not connected' },
-  scanRecording: { ar: 'جارٍ التسجيل، ابقَ ثابتًا…', en: 'Recording, keep still…' },
+  draftTranslation: { ar: 'ترجمة أولية لم يراجعها متحدث أصلي', en: 'Draft translation, not yet checked by a native speaker' },
 
-  viewTabs: { ar: 'طريقة عرض النتيجة', en: 'Result views' },
-  pilgrimView: { ar: 'ما يراه الحاج', en: 'Pilgrim view' },
-  doctorView: { ar: 'ما يراه الطبيب', en: 'Doctor view' },
+  identifyTitle: { ar: 'امسح بطاقة الحاج', en: "Scan the pilgrim's card" },
+  identifyLede: {
+    ar: 'مرّر باركود البطاقة أمام الماسح. يظهر الاسم والعمر والجنس والجنسية لهذا الفحص فقط، ولا يُحفظ شيء.',
+    en: "Hold the card's barcode to the scanner. Name, age, sex and nationality show for this screening only; nothing is saved.",
+  },
+  cardField: { ar: 'رمز البطاقة', en: 'Card code' },
+  cardPlaceholder: { ar: 'بانتظار الماسح…', en: 'Waiting for the scanner…' },
+  lookUp: { ar: 'بحث', en: 'Look up' },
+  sampleCards: { ar: 'بطاقات تجريبية', en: 'Sample cards' },
+  sampleCardsNote: {
+    ar: 'صيغة البطاقة الحقيقية غير معروفة بعد، لذلك يقبل النموذج هذه البطاقات المختلَقة فقط.',
+    en: "The real card format isn't known yet, so the prototype only accepts these invented cards.",
+  },
+  noCard: { ar: 'متابعة بلا بطاقة', en: 'Continue without a card' },
+  cardEmpty: { ar: 'لم يصل رمز من الماسح. امسح البطاقة مرة أخرى.', en: 'No code came from the scanner. Scan the card again.' },
+  cardUnknown: {
+    ar: 'لم نتعرف على هذه البطاقة. جرّب بطاقة تجريبية أو تابع بلا بطاقة.',
+    en: "This card wasn't recognised. Try a sample card, or continue without one.",
+  },
+  prepHint: {
+    ar: 'اطلب من الحاج خلع الحذاء والجوارب والجلوس قليلًا قبل الفحص.',
+    en: 'Ask the pilgrim to take off shoes and socks and sit briefly before the exam.',
+  },
+  exploreStation: { ar: 'استكشف مكونات المحطة', en: 'Explore inside the station' },
 
-  doctorTitle: { ar: 'ملخص الفحص للطبيب', en: 'Screening summary' },
+  pilgrim: { ar: 'الحاج', en: 'Pilgrim' },
+  age: { ar: 'العمر', en: 'Age' },
+  sex: { ar: 'الجنس', en: 'Sex' },
+  nationality: { ar: 'الجنسية', en: 'Nationality' },
+  screenLanguage: { ar: 'لغة الشاشة', en: 'Screen language' },
+  sampleRecord: { ar: 'سجل تجريبي', en: 'Sample record' },
+  anonymous: { ar: 'بلا بطاقة', en: 'No card' },
+
+  examTitle: { ar: 'افحص القدمين', en: 'Examine both feet' },
+  examLede: {
+    ar: 'الفحص أولًا ثم القياس. سجّل ما تجده، ويمكنك اختيار «غير متأكد».',
+    en: 'Examine first, then measure. Record what you find; "Not sure" is allowed.',
+  },
+  examNote: {
+    ar: 'قراءات الحرارة والضغط وحدها لا تستبعد اعتلال الأعصاب أو ضعف التروية.',
+    en: 'Temperature and pressure alone cannot rule out nerve damage or poor circulation.',
+  },
+  examRemaining: { ar: 'بنود لم تُسجّل: {n}', en: 'Not recorded yet: {n}' },
+  examDone: { ar: 'سُجّلت كل البنود', en: 'Every item recorded' },
+  examContinue: { ar: 'سلّم المحطة للحاج', en: 'Hand over to the pilgrim' },
+  examUrgent: { ar: 'عاجل: أوقف القياس وافتح التقرير', en: 'Urgent: stop testing, open the report' },
+  whichFoot: { ar: 'أي قدم؟', en: 'Which foot?' },
+
+  doctorTitle: { ar: 'التقرير السريري', en: 'Clinical report' },
   doctorLede: { ar: 'دعم قرار للفحص الوقائي، وليس تشخيصًا.', en: 'Decision support for preventive screening, not a diagnosis.' },
-  referralShort: { ar: 'يحتاج تحويلًا إلى النقطة الطبية', en: 'Refer to the medical point' },
-  noReferral: { ar: 'لا يحتاج تحويلًا', en: 'No referral needed' },
-  whyThisLevel: { ar: 'سبب مستوى الخطر', en: 'Why this risk level' },
+  provisional: {
+    ar: 'فئات تعامل مقترحة من الفريق، تحتاج مراجعة سريرية وتحققًا مستقبليًا، ولا تمثل احتمالات إصابة.',
+    en: 'Proposed action categories from the team sheet. They need clinical review and prospective validation, and are not injury probabilities.',
+  },
+  criteria: { ar: 'المعايير', en: 'Criteria' },
+  actionRequired: { ar: 'الإجراء المطلوب', en: 'Action required' },
+  whyThisCategory: { ar: 'سبب التصنيف', en: 'Why this category' },
   illustrativeRule: { ar: 'توضيحية', en: 'illustrative' },
+  examFindings: { ar: 'نتائج الفحص', en: 'Exam findings' },
   pilgrimAnswers: { ar: 'إجابات الحاج', en: "Pilgrim's answers" },
+  answeredIn: { ar: 'أجاب بلغة: {language}', en: 'Answered in {language}' },
+  notRecorded: { ar: 'لم يُسجَّل', en: 'Not recorded' },
+  nothingFound: { ar: 'لا توجد نتائج إيجابية', en: 'No positive findings' },
   dataSources: { ar: 'مصادر البيانات', en: 'Data sources' },
   sourcePreset: { ar: 'سيناريو جاهز · بيانات تجريبية', en: 'Preset scenario · simulated' },
   sourceFake: { ar: 'جهاز ESP32 تجريبي · بيانات تجريبية', en: 'Fake ESP32 · simulated' },
   sourceEsp32: { ar: 'منصة ESP32 · قراءة حية', en: 'ESP32 platform · live reading' },
   capturedAt: { ar: 'وقت القراءة {time}', en: 'Captured {time}' },
+  testingStopped: { ar: 'أُوقف القياس بسبب علامة عاجلة', en: 'Device testing stopped for an urgent finding' },
+  noReading: { ar: 'لا توجد قراءة ضغط', en: 'No pressure reading' },
   zoneLoads: { ar: 'الحمل النسبي لكل منطقة', en: 'Relative load by zone' },
   colZone: { ar: 'المنطقة', en: 'Zone' },
   colGap: { ar: 'الفرق', en: 'Gap' },
@@ -106,237 +90,173 @@ export const UI = {
     ar: 'نسبة من ضغطة المعايرة لكل مستشعر، وليست قياس ضغط بالكيلوباسكال.',
     en: "Share of each sensor's calibration press, not a pressure measurement in kPa.",
   },
+
+  todaysScreenings: { ar: 'فحوصات اليوم', en: "Today's screenings" },
+  screened: { ar: 'تم فحصهم', en: 'screened' },
+  highConcern: { ar: 'خطورة مرتفعة أو عاجلة', en: 'high or urgent' },
+  referred: { ar: 'تم تحويلهم', en: 'referred' },
+  colTime: { ar: 'الوقت', en: 'Time' },
+  colScreening: { ar: 'رقم الفحص', en: 'Screening' },
+  colLanguage: { ar: 'لغة الحاج', en: 'Language' },
+  colResult: { ar: 'الفئة', en: 'Category' },
+  colAreas: { ar: 'المناطق المحددة', en: 'Marked areas' },
+  colReferral: { ar: 'تحويل', en: 'Referral' },
+  thisScreening: { ar: 'هذا الفحص', en: 'This screening' },
 } as const satisfies Record<string, Bilingual>;
 
-/** What the scan screen says when a read fails, by reason. */
-export const SENSOR_ERRORS: Readonly<Record<SensorErrorReason, Bilingual>> = {
-  readFailed: UI.sensorError,
-  noDevice: {
-    ar: 'المنصة غير متصلة. اطلب من المرشد توصيلها ثم أعد المحاولة.',
-    en: "The platform isn't connected. Ask the volunteer to connect it, then try again.",
+export const SEX_NAMES: Readonly<Record<Sex, Bilingual>> = {
+  male: { ar: 'ذكر', en: 'Male' },
+  female: { ar: 'أنثى', en: 'Female' },
+};
+
+/** Names for the nationalities the station maps to a language (models/pilgrimCards.ts). */
+export const NATIONALITY_NAMES: Readonly<Record<string, Bilingual>> = {
+  SA: { ar: 'السعودية', en: 'Saudi Arabia' },
+  EG: { ar: 'مصر', en: 'Egypt' },
+  DZ: { ar: 'الجزائر', en: 'Algeria' },
+  SD: { ar: 'السودان', en: 'Sudan' },
+  IQ: { ar: 'العراق', en: 'Iraq' },
+  MA: { ar: 'المغرب', en: 'Morocco' },
+  ID: { ar: 'إندونيسيا', en: 'Indonesia' },
+  PK: { ar: 'باكستان', en: 'Pakistan' },
+  IN: { ar: 'الهند', en: 'India' },
+  BD: { ar: 'بنغلاديش', en: 'Bangladesh' },
+  NG: { ar: 'نيجيريا', en: 'Nigeria' },
+  TR: { ar: 'تركيا', en: 'Türkiye' },
+  MY: { ar: 'ماليزيا', en: 'Malaysia' },
+  SN: { ar: 'السنغال', en: 'Senegal' },
+  ML: { ar: 'مالي', en: 'Mali' },
+  RU: { ar: 'روسيا', en: 'Russia' },
+  UZ: { ar: 'أوزبكستان', en: 'Uzbekistan' },
+  GB: { ar: 'المملكة المتحدة', en: 'United Kingdom' },
+};
+
+export const EXAM_GROUP_COPY: Readonly<Record<ExamGroup, { readonly title: Bilingual; readonly note: Bilingual }>> = {
+  inspect: {
+    title: { ar: 'افحص القدمين بالنظر', en: 'Inspect both feet' },
+    note: { ar: 'الجروح والبثور والثفن والتشوه والاحمرار والتورم.', en: 'Wounds, blisters, callus, deformity, redness and swelling.' },
   },
-  noData: {
-    ar: 'توقفت المنصة عن إرسال القراءات. تأكد من الكابل ثم أعد المحاولة.',
-    en: 'The platform stopped sending readings. Check the cable and try again.',
+  essential: {
+    title: { ar: 'الإحساس والتروية', en: 'Sensation and circulation' },
+    note: {
+      ar: 'إلزامي: من دونهما يكون التقييم غير مكتمل. افحص بمزيد من الاختبارات عند الحاجة.',
+      en: 'Required: without these the assessment is incomplete. Test further when indicated.',
+    },
   },
-  noFeet: {
-    ar: 'لم نرصد القدمين على المنصة. قف على العلامتين ثم أعد المحاولة.',
-    en: 'No feet detected on the platform. Stand on both outlines and try again.',
+  urgent: {
+    title: { ar: 'علامات عاجلة', en: 'Urgent signs' },
+    note: { ar: 'أي «نعم» توقف القياس وتحوّل الحاج فورًا.', en: 'Any "yes" stops device testing and refers the pilgrim now.' },
   },
 };
 
-/** Plain-language names for the rules in models/rules.ts, shown in the doctor view. Keyed by rule id. */
-export const RULE_COPY: Readonly<Record<string, Bilingual>> = {
-  'open-wound': { ar: 'جرح مفتوح حاليًا', en: 'Open wound reported' },
-  'diabetes-with-numbness': { ar: 'سكري مع تنميل في القدم', en: 'Diabetes with numbness' },
-  'diabetes-with-high-load': { ar: 'سكري مع منطقة ضغط مرتفع جدًا', en: 'Diabetes with a high-pressure zone' },
-  diabetes: { ar: 'مصاب بالسكري', en: 'Has diabetes' },
-  'high-load-zone': { ar: 'منطقة ضغط مرتفع جدًا', en: 'High-pressure zone' },
-  'left-right-asymmetry': { ar: 'فرق في الضغط بين القدمين', en: 'Left/right pressure difference' },
-  'injury-history': {
-    ar: 'اثنان أو أكثر من: إصابة سابقة، ألم، حذاء غير معتاد',
-    en: 'Two or more of: past injury, pain, unusual footwear',
-  },
-  'baseline-care': { ar: 'إرشادات العناية الأساسية (حرارة الأرض)', en: 'Baseline care advice (hot ground)' },
+export const EXAM_COPY: Readonly<Record<ExamKey, Bilingual>> = {
+  openWound: { ar: 'جرح مفتوح أو قرحة', en: 'Open wound or ulcer' },
+  blister: { ar: 'نفطة (بثرة)', en: 'Blister' },
+  callus: { ar: 'ثفن (تصلّب الجلد)', en: 'Callus' },
+  deformity: { ar: 'تشوّه (مثل الإبهام الأروح أو الأصابع المخلبية)', en: 'Deformity (e.g. bunion, claw toes)' },
+  redness: { ar: 'احمرار', en: 'Redness' },
+  swelling: { ar: 'تورّم', en: 'Swelling' },
+  lossOfSensation: { ar: 'فقدان الإحساس الواقي (خيط 10 غرامات)', en: 'Loss of protective sensation (10-g monofilament)' },
+  reducedPulses: { ar: 'ضعف نبض القدم أو غيابه', en: 'Reduced or absent foot pulses' },
+  spreadingInfection: { ar: 'عدوى منتشرة أو أعراض عامة', en: 'Spreading infection, or looks unwell' },
+  hotSwollenFoot: { ar: 'قدم ساخنة وحمراء ومتورمة حديثًا', en: 'New hot, red, swollen foot' },
+  coldPaleFoot: { ar: 'قدم باردة أو شاحبة فجأة', en: 'Sudden cold or pale foot' },
+  majorTrauma: { ar: 'إصابة شديدة أو تعذّر تحمل الوزن', en: 'Significant injury, or cannot bear weight' },
 };
 
-export interface QuestionCopy {
-  readonly question: Bilingual;
-  readonly short: Bilingual;
-  readonly why: Bilingual;
+export interface CategoryCopy {
+  readonly title: Bilingual;
+  readonly criteria: Bilingual;
+  readonly action: Bilingual;
 }
 
-export const QUESTIONS: Readonly<Record<AnswerKey, QuestionCopy>> = {
-  diabetes: {
-    question: { ar: 'هل لديك مرض السكري؟', en: 'Do you have diabetes?' },
-    short: { ar: 'السكري', en: 'Diabetes' },
-    why: { ar: 'السكري يقلل الإحساس في القدم ويبطئ التئام الجروح.', en: 'Diabetes reduces feeling in the feet and slows wound healing.' },
-  },
-  previousFootInjury: {
-    question: { ar: 'هل أُصبت في قدمك من قبل؟', en: 'Have you injured your foot before?' },
-    short: { ar: 'إصابة سابقة', en: 'Past injury' },
-    why: { ar: 'الإصابة السابقة تزيد احتمال تكرارها مع المشي الطويل.', en: 'A past injury is more likely to return with long walking.' },
-  },
-  currentPain: {
-    question: { ar: 'هل تشعر بألم في قدمك الآن؟', en: 'Do you feel foot pain right now?' },
-    short: { ar: 'ألم حالي', en: 'Pain now' },
-    why: { ar: 'الألم قد يكون أول علامة على بثرة أو التهاب.', en: 'Pain can be the first sign of a blister or inflammation.' },
-  },
-  numbness: {
-    question: { ar: 'هل تشعر بتنميل في قدميك؟', en: 'Do your feet feel numb?' },
-    short: { ar: 'تنميل', en: 'Numbness' },
-    why: { ar: 'مع التنميل قد لا يشعر الحاج بالجرح عند حدوثه.', en: 'With numbness, a wound can go unnoticed.' },
-  },
-  currentWound: {
-    question: { ar: 'هل يوجد جرح في قدمك الآن؟', en: 'Is there a wound on your foot now?' },
-    short: { ar: 'جرح حالي', en: 'Wound now' },
-    why: { ar: 'أي جرح مفتوح يحتاج تقييمًا طبيًا قبل مواصلة المشي.', en: 'Any open wound needs a medical check before more walking.' },
-  },
-  unusualFootwear: {
-    question: { ar: 'هل تلبس حذاءً جديدًا أو غير معتاد؟', en: 'Are you wearing new or unusual shoes?' },
-    short: { ar: 'حذاء غير معتاد', en: 'Unusual shoes' },
-    why: { ar: 'الحذاء الجديد أو الضيق يسبب الاحتكاك والبثور.', en: 'New or tight shoes cause friction and blisters.' },
-  },
-};
-
-export const ZONE_NAMES: Readonly<Record<Zone, Bilingual>> = {
-  hallux: { ar: 'إبهام القدم', en: 'Big toe' },
-  medialForefoot: { ar: 'مقدمة القدم الداخلية', en: 'Inner forefoot' },
-  lateralForefoot: { ar: 'مقدمة القدم الخارجية', en: 'Outer forefoot' },
-  heel: { ar: 'الكعب', en: 'Heel' },
-};
-
-export const FLAG_REASONS: Readonly<Record<FlagReason, Bilingual>> = {
-  highLoad: { ar: 'ضغط مرتفع جدًا', en: 'high pressure' },
-  asymmetry: { ar: 'فرق كبير بين القدمين', en: 'big left/right gap' },
-};
-
-export const RISK_LEVELS: Readonly<Record<RiskLevel, { readonly title: Bilingual; readonly summary: Bilingual }>> = {
+/** The team's action-category sheet (2026-10-09), English and Arabic editions. */
+export const CATEGORY_COPY: Readonly<Record<ActionCategory, CategoryCopy>> = {
   low: {
-    title: { ar: 'خطر منخفض', en: 'Low risk' },
-    summary: { ar: 'قدماك بحالة جيدة. حافظ على العناية اليومية.', en: 'Your feet look fine. Keep up daily care.' },
+    title: { ar: 'خطورة منخفضة', en: 'Low concern' },
+    criteria: {
+      ar: 'الجلد سليم، ولا توجد أعراض مقلقة؛ فُحص الإحساس الواقي والتروية وكانا طبيعيين؛ ولا يوجد تاريخ مرضي مهم للقدم؛ والحذاء مناسب والقراءات موثوقة.',
+      en: 'Skin intact; no concerning symptoms; protective sensation and circulation assessed as normal; no significant prior foot disease; suitable footwear; reliable readings.',
+    },
+    action: {
+      ar: 'التوعية بالعناية بالقدم، وارتداء حذاء مناسب، وتجنب المشي حافيًا، وفحص القدمين يوميًا.',
+      en: 'Foot-care advice, suitable footwear, avoid barefoot walking, daily self-inspection.',
+    },
   },
   moderate: {
-    title: { ar: 'خطر متوسط', en: 'Moderate risk' },
-    summary: { ar: 'توجد علامات تحتاج انتباهًا. اتبع التوصيات التالية.', en: 'Some signs need attention. Follow the advice below.' },
+    title: { ar: 'خطورة متوسطة', en: 'Moderate concern' },
+    criteria: {
+      ar: 'لا توجد علامات خطورة مرتفعة، لكن الحذاء يحتك بالجلد، أو زاد المشي كثيرًا، أو يوجد ثفن أو تشوه واضح، أو تهيج موضعي أو نفطة بسيطة، أو قراءة غير مفسرة تتكرر عند القياس.',
+      en: 'No high-risk findings, but footwear rubbing, unusually heavy walking, substantial callus or deformity, minor localized irritation or uncomplicated blister, or a repeatable unexplained sensor finding.',
+    },
+    action: {
+      ar: 'تخفيف الاحتكاك والضغط، وفحص الجلد وحمايته، وتعديل الحذاء، وإعادة التقييم إذا استمرت العلامات أو ساءت.',
+      en: 'Reduce friction and loading; inspect and protect skin; adjust footwear; arrange reassessment if findings persist or worsen.',
+    },
   },
   high: {
-    title: { ar: 'خطر مرتفع', en: 'High risk' },
-    summary: { ar: 'يُنصح بمراجعة الفريق الطبي اليوم.', en: 'We recommend seeing the medical team today.' },
-  },
-};
-
-export const RECOMMENDATIONS: Readonly<Record<RecommendationKey, Bilingual>> = {
-  seeMedical: { ar: 'توجّه إلى أقرب نقطة طبية اليوم.', en: 'Visit the nearest medical point today.' },
-  offload: { ar: 'احمِ المنطقة المحددة ببطانة أو ضمادة واقية.', en: 'Protect the marked area with a cushioned insole or pad.' },
-  footwear: { ar: 'البس حذاءً مريحًا مجرّبًا مع جوارب قطنية نظيفة.', en: 'Wear comfortable, broken-in shoes with clean cotton socks.' },
-  dailyCheck: { ar: 'افحص قدميك كل مساء، وبين الأصابع أيضًا.', en: 'Check your feet every evening, including between the toes.' },
-  rest: { ar: 'استرح وارفع قدميك بين المناسك.', en: 'Rest and raise your feet between rituals.' },
-  hotGround: { ar: 'لا تمشِ حافيًا، فالأرض قد تصل حرارتها إلى 50–70°C.', en: 'Never walk barefoot: the ground can reach 50–70°C.' },
-};
-
-export const PILGRIM_LANGUAGES: Readonly<Record<PilgrimLanguage, Bilingual>> = {
-  ar: { ar: 'العربية', en: 'Arabic' },
-  en: { ar: 'الإنجليزية', en: 'English' },
-  ur: { ar: 'الأردية', en: 'Urdu' },
-  id: { ar: 'الإندونيسية', en: 'Indonesian' },
-  tr: { ar: 'التركية', en: 'Turkish' },
-  bn: { ar: 'البنغالية', en: 'Bengali' },
-  ha: { ar: 'الهوسا', en: 'Hausa' },
-  fa: { ar: 'الفارسية', en: 'Persian' },
-  ms: { ar: 'الملايوية', en: 'Malay' },
-};
-
-/** The 3D device page (device.html). */
-export const DEVICE_UI = {
-  pageTitle: { ar: 'مكونات محطة الفحص', en: 'Inside the screening station' },
-  overviewLede: {
-    ar: 'اختر طبقة لتقترب الكاميرا منها وتعرض تفاصيلها.',
-    en: 'Pick a layer and the camera moves in so you can see its details.',
-  },
-  layerCount: { ar: 'الطبقة {n} من {total}', en: 'Layer {n} of {total}' },
-  layerList: { ar: 'طبقات المحطة', en: 'Station layers' },
-  partsTitle: { ar: 'المكونات', en: 'Parts' },
-  backToAll: { ar: 'كل الطبقات', en: 'All layers' },
-  previous: { ar: 'الطبقة الأعلى', en: 'Layer above' },
-  next: { ar: 'الطبقة الأسفل', en: 'Layer below' },
-  explode: { ar: 'فكّ الطبقات', en: 'Explode' },
-  assemble: { ar: 'تجميع', en: 'Assemble' },
-  openApp: { ar: 'تطبيق الفحص', en: 'Screening app' },
-  language: { ar: 'English', en: 'العربية' },
-  hint: {
-    ar: 'اسحب للتدوير · مرّر للتكبير · اضغط على طبقة',
-    en: 'Drag to rotate · scroll to zoom · tap a layer',
-  },
-  keysHint: { ar: 'الأسهم للتنقل بين الطبقات، و Esc للعودة', en: 'Arrow keys move between layers, Esc goes back' },
-  notToScale: {
-    ar: 'نموذج توضيحي ثلاثي الأبعاد مبني على تصور الفريق، وليس بمقاس حقيقي.',
-    en: "Illustrative 3D model based on the team's concept render. Not to scale.",
-  },
-  loading: { ar: 'جارٍ تحميل النموذج ثلاثي الأبعاد…', en: 'Loading the 3D model…' },
-  noWebgl: {
-    ar: 'هذا المتصفح لا يدعم WebGL، لذلك لا يمكن عرض النموذج ثلاثي الأبعاد.',
-    en: "This browser doesn't support WebGL, so the 3D model can't be shown.",
-  },
-} as const satisfies Record<string, Bilingual>;
-
-export interface DeviceLayerCopy {
-  readonly name: Bilingual;
-  readonly detail: Bilingual;
-}
-
-export const DEVICE_LAYER_COPY: Readonly<Record<DeviceLayerId, DeviceLayerCopy>> = {
-  topGlass: {
-    name: { ar: 'سطح شفاف', en: 'Transparent top' },
-    detail: {
-      ar: 'السطح الذي يقف عليه الحاج. ترشده علامتا القدمين إلى مكان كل قدم، وترى الكاميرات باطن القدم من خلاله.',
-      en: 'The surface the pilgrim stands on. Two foot outlines show where each foot goes, and the cameras see the soles through it.',
+    title: { ar: 'خطورة مرتفعة - تقييم سريري قريب', en: 'High concern: priority clinical review' },
+    criteria: {
+      ar: 'فقدان الإحساس الواقي؛ أو ضعف تروية معروف أو مشتبه؛ أو قرحة سابقة أو بتر أو قدم شاركو؛ أو جرح مفتوح حالي، أو آفة تتفاقم، أو آفة في قدم معرضة للخطر.',
+      en: 'Loss of protective sensation; known or suspected poor circulation; previous ulcer, amputation or Charcot disease; or current open wound, worsening lesion, or lesion on a vulnerable foot.',
+    },
+    action: {
+      ar: 'تقييم سريري قريب؛ وتقييم في اليوم نفسه عند وجود جرح نشط أو آفة تتفاقم؛ ووضع خطة فردية لتخفيف الضغط والمشي.',
+      en: 'Prompt clinician assessment. Same-day review for an active wound or worsening lesion; individualized offloading and walking plan.',
     },
   },
-  cameras: {
-    name: { ar: 'طبقة الكاميرات', en: 'Camera layer' },
-    detail: {
-      ar: 'إطار معدني يحمل كاميرا حرارية (MLX) وكاميرا ESP32 موجّهتين نحو باطن القدم. غير متصلتين في النموذج الحالي.',
-      en: 'A metal tray holding a thermal camera (MLX) and an ESP32 camera, both facing up at the soles. Not connected in the prototype yet.',
+  urgent: {
+    title: { ar: 'إحالة عاجلة تتجاوز التصنيف', en: 'Urgent override' },
+    criteria: {
+      ar: 'علامات عدوى منتشرة أو أعراض عامة؛ أو قدم ساخنة وحمراء ومتورمة لدى شخص لديه اعتلال أعصاب؛ أو قدم باردة وشاحبة فجأة؛ أو إصابة شديدة أو تعذر تحمل الوزن.',
+      en: 'Spreading infection or systemic illness; new hot, red, swollen neuropathic foot; sudden cold or pale foot; significant trauma or inability to bear weight.',
+    },
+    action: {
+      ar: 'إيقاف القياس الروتيني، وترتيب تقييم طبي عاجل أو إسعافي. عند الاشتباه بقدم شاركو، يلزم تثبيت القدم وتخفيف الضغط بتوجيه سريري.',
+      en: 'Stop routine device testing; arrange urgent or emergency medical assessment. Suspected Charcot requires clinician-directed immobilization and offloading.',
     },
   },
-  insulation: {
-    name: { ar: 'سطح عازل', en: 'Insulating layer' },
-    detail: {
-      ar: 'لوح مثقّب يفصل طبقة الكاميرات عن الدائرة الكهربائية أسفله.',
-      en: 'A perforated plate that separates the camera layer from the circuit board below.',
+  incomplete: {
+    title: { ar: 'التقييم غير مكتمل', en: 'Incomplete assessment' },
+    criteria: {
+      ar: 'لم يُفحص الإحساس أو التروية فحصًا أساسيًا، أو كانت قراءات الحرارة أو الضغط غير موثوقة.',
+      en: 'Essential sensation or circulation examination missing, or temperature or pressure data unreliable.',
     },
-  },
-  circuit: {
-    name: { ar: 'الدائرة الكهربائية', en: 'Circuit board' },
-    detail: {
-      ar: 'يقرأ متحكم ESP32-S3 المستشعرات ويرسل القراءات إلى الشاشة، وتزوّد البطاريات المحطة بالطاقة.',
-      en: 'An ESP32-S3 microcontroller reads the sensors and sends the readings to the screen. The battery pack powers the station.',
-    },
-  },
-  innerFrame: {
-    name: { ar: 'هيكل داخلي', en: 'Inner frame' },
-    detail: {
-      ar: 'حاضنة تثبّت الدائرة الكهربائية والطبقات التي فوقها في مكانها.',
-      en: 'A tray that holds the circuit board and the layers above it in place.',
-    },
-  },
-  supports: {
-    name: { ar: 'دعامات', en: 'Supports' },
-    detail: {
-      ar: 'شبكة صلبة تنقل وزن الحاج إلى مستشعرات الضغط بالتساوي.',
-      en: "A rigid grid that carries the pilgrim's weight evenly down to the pressure sensors.",
-    },
-  },
-  pressureSensors: {
-    name: { ar: 'مستشعرات الضغط', en: 'Pressure sensors' },
-    detail: {
-      ar: '8 مستشعرات FSR402، أربعة تحت كل قدم: إبهام القدم، ومقدمة القدم الداخلية والخارجية، والكعب.',
-      en: '8 FSR402 sensors, 4 under each foot: big toe, inner forefoot, outer forefoot and heel.',
-    },
-  },
-  outerShell: {
-    name: { ar: 'هيكل خارجي', en: 'Outer shell' },
-    detail: {
-      ar: 'مصنوع من بلاستيك ABS، وهو مادة عازلة ومقاومة للظروف الخارجية.',
-      en: 'Made of ABS plastic, an insulating material that stands up to outdoor conditions.',
+    action: {
+      ar: 'إكمال التقييم أو إعادة القياس، وعدم تصنيف الشخص ضمن «الخطورة المنخفضة».',
+      en: 'Complete or repeat the assessment; do not report "low concern".',
     },
   },
 };
 
-export const DEVICE_PART_COPY: Readonly<Record<DevicePartId, DeviceLayerCopy>> = {
-  mlxCamera: {
-    name: { ar: 'كاميرا MLX', en: 'MLX camera' },
-    detail: {
-      ar: 'كاميرا حرارية تقيس حرارة باطن القدم لتحديد المناطق الأدفأ من غيرها.',
-      en: 'A thermal camera that measures sole temperature to find areas warmer than the rest.',
-    },
-  },
-  esp32Camera: {
-    name: { ar: 'كاميرا ESP-32', en: 'ESP32 camera' },
-    detail: {
-      ar: 'كاميرا ملونة صغيرة تلتقط صورة لباطن القدم.',
-      en: 'A small colour camera that takes a picture of the sole.',
-    },
-  },
+/** Plain-language names for the rules in models/rules.ts, shown in the clinical report. Keyed by rule id. */
+export const RULE_COPY: Readonly<Record<string, Bilingual>> = {
+  'spreading-infection': { ar: 'عدوى منتشرة أو أعراض عامة في الفحص', en: 'Spreading infection or systemic illness on exam' },
+  'infection-with-fever': { ar: 'علامات التهاب في القدم مع حمى أو توعك', en: 'Foot infection signs with fever or feeling unwell' },
+  'hot-swollen-neuropathic-foot': { ar: 'قدم ساخنة متورمة مع اعتلال أعصاب (اشتباه شاركو)', en: 'Hot, swollen neuropathic foot (suspected Charcot)' },
+  'cold-pale-foot': { ar: 'قدم باردة أو شاحبة فجأة', en: 'Sudden cold or pale foot' },
+  'cannot-bear-weight': { ar: 'إصابة شديدة أو تعذر تحمل الوزن', en: 'Significant injury or cannot bear weight' },
+  'pain-stops-walking': { ar: 'ألم يمنع المشي', en: 'Pain stops walking' },
+  'loss-of-sensation': { ar: 'فقدان الإحساس الواقي', en: 'Loss of protective sensation' },
+  'poor-circulation': { ar: 'ضعف نبض القدم (اشتباه ضعف التروية)', en: 'Reduced pulses (suspected poor circulation)' },
+  'ulcer-history': { ar: 'قرحة أو بتر سابق', en: 'Previous ulcer or amputation' },
+  'open-wound': { ar: 'جرح مفتوح أو قرحة في الفحص', en: 'Open wound or ulcer on exam' },
+  'local-infection-signs': { ar: 'احمرار أو تورم أو صديد جديد', en: 'New redness, swelling, warmth or discharge' },
+  'lesion-on-vulnerable-foot': { ar: 'آفة جلدية في قدم معرضة للخطر', en: 'Skin lesion on a vulnerable foot' },
+  'hot-swollen-foot': { ar: 'قدم ساخنة وحمراء ومتورمة', en: 'Hot, red, swollen foot' },
+  'urgent-sign-unsure': { ar: 'علامة عاجلة لم تُستبعد', en: 'Urgent sign not ruled out' },
+  'exam-not-finished': { ar: 'بنود فحص لم تُسجّل', en: 'Exam items not recorded' },
+  'sensation-or-circulation-unclear': { ar: 'نتيجة الإحساس أو التروية غير واضحة', en: 'Sensation or circulation result unclear' },
+  'no-pressure-reading': { ar: 'لا توجد قراءة ضغط', en: 'No pressure reading' },
+  'footwear-rubbing': { ar: 'حذاء جديد أو يحتك', en: 'New or rubbing footwear' },
+  'heavy-walking-or-exposure': { ar: 'مشي كثير أو حرارة أو رطوبة', en: 'Heavy walking, heat or wet feet' },
+  'callus-or-deformity': { ar: 'ثفن أو تشوه', en: 'Callus or deformity' },
+  'minor-skin-finding': { ar: 'نفطة أو تهيج موضعي بسيط', en: 'Blister or minor local irritation' },
+  'pain-reported': { ar: 'ألم في القدم', en: 'Foot pain' },
+  'numbness-reported': { ar: 'تنميل أبلغ عنه الحاج', en: 'Numbness reported by the pilgrim' },
+  'minor-injury': { ar: 'إصابة حديثة مع قدرة على المشي', en: 'Recent injury, still walking' },
+  'pressure-flag': { ar: 'منطقة ضغط مرتفع أو فرق بين القدمين (قراءة واحدة)', en: 'High-pressure zone or left/right gap (one scan)' },
+  'inspection-unsure': { ar: 'نتيجة فحص بالنظر غير مؤكدة', en: 'Inspection finding unsure' },
+  'cannot-self-inspect': { ar: 'لا يستطيع فحص قدميه يوميًا', en: 'Cannot check feet daily' },
+  'baseline-care': { ar: 'إرشادات العناية الأساسية', en: 'Baseline care advice' },
 };

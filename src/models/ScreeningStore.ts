@@ -1,31 +1,45 @@
+import { suggestedLocale } from './pilgrimCards';
 import { DEFAULT_CALIBRATION, type Calibration } from './pressureProtocol';
-import { QUESTION_COUNT, QUESTION_ORDER } from './questions';
-import { assessRisk } from './riskAssessment';
-import { scenarioAnswers } from './scenarios';
-import type {
-  AnswerKey,
-  CalibrationStep,
-  DeviceStatus,
-  Language,
-  PressureMap,
-  RiskAnswers,
-  RiskResult,
-  ScenarioName,
-  ScreenName,
-  SensorErrorReason,
-  SensorMode,
-  SensorReadings,
+import { emptyAnswers, emptyExam, isQuestionComplete, QUESTION_COUNT, questionAt, withAnswer, type QuestionDef } from './questions';
+import { assessScreening, hasUrgentFinding } from './riskAssessment';
+import { scenarioAnswers, scenarioExam } from './scenarios';
+import {
+  PILGRIM_SCREENS,
+  type Answer,
+  type CalibrationStep,
+  type DeviceStatus,
+  type ExamFindings,
+  type ExamKey,
+  type Language,
+  type Locale,
+  type PilgrimProfile,
+  type PressureMap,
+  type RiskAnswers,
+  type ScenarioName,
+  type ScreeningResult,
+  type ScreenName,
+  type SensorErrorReason,
+  type SensorMode,
+  type SensorReadings,
+  type Side,
 } from './types';
 
 export const SENSOR_COUNT = 8;
 
+export type CardError = 'empty' | 'unknown';
+
 export interface AppState {
   readonly screen: ScreenName;
+  /** Staff screens: identify, exam, the clinical report and the volunteer list. */
   readonly language: Language;
+  /** The pilgrim's screens: handover, questions, scan and result. */
+  readonly locale: Locale;
   readonly scenario: ScenarioName;
+  /** From the scanned card, for this screening only. Null when the pilgrim has no card. */
+  readonly profile: PilgrimProfile | null;
+  readonly cardError: CardError | null;
+  readonly exam: ExamFindings;
   readonly answers: RiskAnswers;
-  /** Which questions have an explicit answer on screen. */
-  readonly answered: Readonly<Partial<Record<AnswerKey, true>>>;
   readonly questionIndex: number;
   /** Sensors read so far during the scan, 0–SENSOR_COUNT. */
   readonly scanProgress: number;
@@ -47,23 +61,31 @@ export interface AppState {
 
 type Listener = (state: AppState) => void;
 
-const allAnswered = (): AppState['answered'] =>
-  Object.fromEntries(QUESTION_ORDER.map((key) => [key, true])) as AppState['answered'];
+/** Everything that belongs to one pilgrim's screening, cleared for the next one. */
+const freshScreening = (): Pick<
+  AppState,
+  'profile' | 'cardError' | 'exam' | 'answers' | 'questionIndex' | 'scanProgress' | 'readings' | 'sensorError' | 'livePressure'
+> => ({
+  profile: null,
+  cardError: null,
+  exam: emptyExam(),
+  answers: emptyAnswers(),
+  questionIndex: 0,
+  scanProgress: 0,
+  readings: null,
+  sensorError: null,
+  livePressure: null,
+});
 
 export function createInitialState(scenario: ScenarioName = 'moderate', calibration: Calibration = DEFAULT_CALIBRATION): AppState {
   return {
-    screen: 'start',
+    screen: 'identify',
     language: 'ar',
+    locale: 'ar',
     scenario,
-    answers: scenarioAnswers(scenario),
-    answered: {},
-    questionIndex: 0,
-    scanProgress: 0,
-    readings: null,
-    sensorError: null,
+    ...freshScreening(),
     sensorMode: 'preset',
     deviceStatus: 'disconnected',
-    livePressure: null,
     calibration,
     calibrating: null,
     weakSensors: [],
@@ -74,23 +96,29 @@ export function createInitialState(scenario: ScenarioName = 'moderate', calibrat
 /** True while a device (real or fake) supplies the pressure instead of a preset. */
 export const usesDevice = (state: AppState): boolean => state.sensorMode !== 'preset';
 
-/** Anything on screen that isn't from the real board is simulated and must be labelled. The volunteer list is invented sample data. */
-export const showsSimulatedData = (state: AppState): boolean => state.sensorMode !== 'esp32' || state.screen === 'volunteer';
+/**
+ * Anything on screen that isn't from the real board is simulated and must be labelled.
+ * The volunteer list is invented, and every card the prototype accepts is a sample card.
+ */
+export const showsSimulatedData = (state: AppState): boolean =>
+  state.sensorMode !== 'esp32' || state.screen === 'volunteer' || state.profile !== null;
 
 export const isScanComplete = (state: AppState): boolean =>
   state.readings !== null && state.scanProgress >= SENSOR_COUNT;
 
-/** Derived, never stored: the result exists once a scan has finished. */
-export function selectResult(state: AppState): RiskResult | null {
-  if (!state.readings || !isScanComplete(state)) return null;
-  return assessRisk(state.answers, state.readings.pressure);
+/** An urgent finding in the exam or the answers stops routine device testing: no scan. */
+export const isTestingStopped = (state: AppState): boolean => hasUrgentFinding(state.answers, state.exam);
+
+/** Derived, never stored: the result exists once a scan has finished, or straight away when testing stopped. */
+export function selectResult(state: AppState): ScreeningResult | null {
+  if (state.readings && isScanComplete(state)) return assessScreening(state.answers, state.exam, state.readings.pressure);
+  if (isTestingStopped(state)) return assessScreening(state.answers, state.exam, null);
+  return null;
 }
 
-export function currentQuestion(state: AppState): AnswerKey {
-  const key = QUESTION_ORDER[state.questionIndex];
-  if (!key) throw new Error(`No question at index ${state.questionIndex}`);
-  return key;
-}
+export const currentQuestion = (state: AppState): QuestionDef => questionAt(state.questionIndex);
+
+export const isPilgrimScreen = (screen: ScreenName): boolean => PILGRIM_SCREENS.includes(screen);
 
 /** Holds app state. Every update replaces the state object; nothing is mutated in place. */
 export class ScreeningStore {
@@ -130,43 +158,114 @@ export class ScreeningStore {
     this.update({ language });
   }
 
-  /** Loads a preset: its answers and pressure. Any finished scan is discarded. */
-  setScenario(scenario: ScenarioName): void {
-    this.update({ scenario, answers: scenarioAnswers(scenario), answered: allAnswered(), readings: null, scanProgress: 0 });
+  setLocale(locale: Locale): void {
+    this.update({ locale });
   }
 
-  beginScreening(language: Language): void {
+  /** Loads a preset: its answers, exam and pressure. Any finished scan is discarded. */
+  setScenario(scenario: ScenarioName): void {
+    this.update({ scenario, answers: scenarioAnswers(scenario), exam: scenarioExam(scenario), readings: null, scanProgress: 0 });
+  }
+
+  /** Deep links into later screens skip the earlier steps, so they get the scenario's answers and exam. */
+  fillFromScenario(): void {
+    this.update({ answers: scenarioAnswers(this.state.scenario), exam: scenarioExam(this.state.scenario) });
+  }
+
+  /** Clears the last pilgrim's screening and goes back to the card scan. */
+  newScreening(): void {
+    this.update({ ...freshScreening(), screen: 'identify' });
+  }
+
+  // ------------------------------------------------------------ step 1: identify
+
+  /** A recognised card, or null to continue without one. The pilgrim's screens open in the card's likely language. */
+  identify(profile: PilgrimProfile | null): void {
     this.update({
-      language,
-      answers: scenarioAnswers(this.state.scenario),
-      answered: {},
-      questionIndex: 0,
-      readings: null,
-      scanProgress: 0,
-      screen: 'questions',
+      profile,
+      cardError: null,
+      locale: profile ? suggestedLocale(profile) : this.state.locale,
+      screen: 'exam',
     });
   }
 
-  /** Records the answer and moves on; after the last question the scan starts. */
-  answerCurrent(value: boolean): void {
-    const key = currentQuestion(this.state);
-    const answers = { ...this.state.answers, [key]: value };
-    const answered = { ...this.state.answered, [key]: true as const };
-    const isLast = this.state.questionIndex >= QUESTION_COUNT - 1;
-    this.update(
-      isLast
-        ? { answers, answered, screen: 'scan', scanProgress: 0, readings: null }
-        : { answers, answered, questionIndex: this.state.questionIndex + 1 },
-    );
+  setCardError(cardError: CardError): void {
+    this.update({ cardError });
+  }
+
+  // ------------------------------------------------------------ step 2: the volunteer's exam
+
+  setExamAnswer(key: ExamKey, answer: Answer): void {
+    this.update({ exam: { ...this.state.exam, [key]: withAnswer(this.state.exam[key], answer) } });
+  }
+
+  setExamSide(key: ExamKey, side: Side): void {
+    const response = this.state.exam[key];
+    if (response.answer !== 'yes') return;
+    this.update({ exam: { ...this.state.exam, [key]: { ...response, side } } });
+  }
+
+  /** An urgent finding skips the device steps and goes straight to the report. */
+  finishExam(): void {
+    this.update({ screen: isTestingStopped(this.state) ? 'result' : 'handover' });
+  }
+
+  // ------------------------------------------------------------ step 3: the pilgrim's questions
+
+  /**
+   * Records the current question's answer. "No" and "Unsure" move on at once; a "yes" that asks for a side or a
+   * follow-up stays on the card until those are given and the pilgrim presses Next.
+   */
+  answerQuestion(answer: Answer): void {
+    const question = currentQuestion(this.state);
+    const answers: RiskAnswers = {
+      ...this.state.answers,
+      [question.key]: withAnswer(this.state.answers[question.key], answer),
+      ...(question.followUp && answer !== 'yes' ? { [question.followUp]: { answer: null, side: null } } : {}),
+    };
+    const hasExtras = question.asksSide || question.followUp !== null;
+    if (answer === 'yes' && hasExtras) this.update({ answers });
+    else this.advance(answers);
+  }
+
+  setQuestionSide(side: Side): void {
+    const { key } = currentQuestion(this.state);
+    const response = this.state.answers[key];
+    if (response.answer !== 'yes') return;
+    this.update({ answers: { ...this.state.answers, [key]: { ...response, side } } });
+  }
+
+  answerFollowUp(answer: Answer): void {
+    const { followUp } = currentQuestion(this.state);
+    if (!followUp || this.state.answers[currentQuestion(this.state).key].answer !== 'yes') return;
+    this.update({ answers: { ...this.state.answers, [followUp]: { answer, side: null } } });
+  }
+
+  /** Moves on once the current question is complete. */
+  nextQuestion(): void {
+    if (isQuestionComplete(currentQuestion(this.state), this.state.answers)) this.advance(this.state.answers);
   }
 
   previousQuestion(): void {
     if (this.state.questionIndex === 0) {
-      this.update({ screen: 'start' });
+      this.update({ screen: 'handover' });
       return;
     }
     this.update({ questionIndex: this.state.questionIndex - 1 });
   }
+
+  /** After the last question the scan starts, unless an answer stopped testing. */
+  private advance(answers: RiskAnswers): void {
+    const isLast = this.state.questionIndex >= QUESTION_COUNT - 1;
+    if (!isLast) {
+      this.update({ answers, questionIndex: this.state.questionIndex + 1 });
+      return;
+    }
+    const stopped = hasUrgentFinding(answers, this.state.exam);
+    this.update({ answers, screen: stopped ? 'result' : 'scan', scanProgress: 0, readings: null, sensorError: null });
+  }
+
+  // ------------------------------------------------------------ step 4: the scan
 
   setReadings(readings: SensorReadings): void {
     this.update({ readings, sensorError: null });
@@ -199,10 +298,5 @@ export class ScreeningStore {
 
   setScanProgress(progress: number): void {
     this.update({ scanProgress: Math.max(0, Math.min(SENSOR_COUNT, progress)) });
-  }
-
-  /** Deep links into later screens skip the questions, so treat every answer as given. */
-  markAllAnswered(): void {
-    this.update({ answered: allAnswered() });
   }
 }

@@ -2,7 +2,7 @@ import './styles/tokens.css';
 import './styles/base.css';
 import './styles/device.css';
 
-import { DEVICE_UI } from './i18n/copy';
+import { DEVICE_UI } from './i18n/deviceCopy';
 import { isLanguage, type Language } from './models/types';
 import { translate } from './i18n/translate';
 import { DeviceController } from './controllers/DeviceController';

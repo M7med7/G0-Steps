@@ -6,7 +6,8 @@ Scope: the Sprint 1 software prototype. It's vanilla TypeScript (strict) in an M
 
 ```
 src/
-  models/       domain types, questions, rules, risk assessment, scenarios, screening log, ScreeningStore,
+  models/       domain types, questions + exam items, rules, risk assessment, scenarios, sample pilgrim cards,
+                screening log, ScreeningStore,
                 pressureProtocol (ESP32 line format + calibration)
   views/        pure render functions (screens/, components/) + KioskView, DemoPanelView, morph
   controllers/  AppController (events, scan lifecycle), HashRouter, DeviceController (3D view input)
@@ -14,7 +15,7 @@ src/
                 + deviceModel (procedural fallback)
   sensors/      SensorSource + SimulatedSource (presets), DeviceSource (4 s capture),
                 FakeDevice and WebSerialDevice (the ESP32 over USB), LineBuffer
-  i18n/         Arabic/English copy and translate()
+  i18n/         staff copy (Arabic/English), locales/ (pilgrim copy in 11 languages), translate()
   styles/       tokens.css, base.css, demo-panel.css, kiosk.css, screens.css
 ```
 
@@ -32,7 +33,10 @@ These shapes live in `src/models/types.ts`. Screens never read sensors directly.
 ```ts
 type Foot = 'L' | 'R';
 type Zone = 'hallux' | 'medialForefoot' | 'lateralForefoot' | 'heel';
-type RiskAnswers = Readonly<Record<AnswerKey, boolean>>;       // the deck's 6 questions
+type Answer = 'yes' | 'no' | 'unsure';
+type Response = { answer: Answer | null; side: 'L' | 'R' | 'both' | null }; // side only after a "yes"
+type RiskAnswers = Readonly<Record<QuestionKey | FollowUpKey, Response>>; // 10 questions + 3 follow-ups
+type ExamFindings = Readonly<Record<ExamKey, Response>>;                 // the volunteer's 12 exam items
 type PressureMap = Readonly<Record<Foot, Record<Zone, number>>>; // relative load 0–1, NOT kPa
 
 interface SensorReadings {
@@ -43,8 +47,9 @@ interface SensorReadings {
   capturedAt: string;
 }
 
-interface RiskResult {
-  level: 'low' | 'moderate' | 'high';
+interface ScreeningResult {
+  category: 'low' | 'moderate' | 'high' | 'urgent' | 'incomplete'; // ADR-0004
+  stopTesting: boolean;                 // urgent: no scan
   refer: boolean;
   zoneFlags: { foot: Foot; zone: Zone; reason: 'highLoad' | 'asymmetry' }[];
   recommendations: RecommendationKey[];  // keys into i18n, max 4
@@ -52,7 +57,7 @@ interface RiskResult {
 }
 ```
 
-- No field holds a name, ID number, passport number, phone number or photo of a real person.
+- No field holds a name, ID number, passport number, phone number or photo of a real person. The one exception is `PilgrimProfile` (from the scanned card): it lives in memory for one screening, is never stored, logged or put in the QR code, and the prototype only accepts the invented sample cards in `models/pilgrimCards.ts` (ADR-0004).
 - `ScreeningStore` replaces its state object on every update; nothing is mutated in place. Derived values (such as the risk result) are computed by selectors, not stored.
 
 ## 3. Sensor seam
@@ -68,19 +73,22 @@ interface RiskResult {
 
 ## 4. Rule engine
 
-- `assessRisk(answers, pressure)` in `src/models/riskAssessment.ts` is a pure function: no I/O, no randomness, no dates.
+- `assessScreening(answers, exam, pressure)` in `src/models/riskAssessment.ts` is a pure function: no I/O, no randomness, no dates. `pressure` is null when there is no reading.
+- Categories follow the team's action-category sheet (ADR-0004). The highest applicable wins: urgent > high > incomplete > moderate > low. An urgent finding stops device testing, so the scan is skipped.
 - Rules live only in `src/models/rules.ts`. Each one has an `id`, a `when`, a `level`, a `refer` flag, its recommendations, and either a citation or `source: 'illustrative'`.
-- Thresholds are named constants (`HIGH_LOAD`, `RAISED_LOAD`, `ASYMMETRY_GAP`, `HISTORY_COUNT_THRESHOLD`), never literals inside rules.
+- Thresholds are named constants (`HIGH_LOAD`, `RAISED_LOAD`, `ASYMMETRY_GAP`), never literals inside rules.
 - `illustrative` rules are prototype-only. The medical members review them before any demo outside the team.
 - Every rule has a unit test, and each preset scenario has a test asserting its expected level.
 
 ## 5. UI
 
-- Design for 1280×800 landscape. Touch targets are at least 60 px (84 px for primary actions, 120 px for yes/no). Make sure it reads at arm's length.
+- Design for 1280×800 landscape, and check every pilgrim screen fits in all 11 languages. Touch targets are at least 60 px (84 px for primary actions, 120 px for yes/no). Make sure it reads at arm's length.
 - Support Arabic (default) and English. Use CSS logical properties so RTL works without overrides. The foot map is never mirrored.
-- Every UI string lives in `src/i18n/copy.ts` with both languages. A test fails if any string is empty in either language or the placeholders differ.
-- Risk is shown with text, an icon and color together, never color alone.
-- Wording is screening language only: "risk," "see the medical team." Never diagnosis or treatment.
+- Anything a pilgrim reads (handover, questions, scan, result, shared components) lives in `src/i18n/locales/<lang>.ts`, one typed `LocaleStrings` file per language, so a missing string fails the type check. Staff-only copy (card, exam, clinical report, volunteer list) lives in `src/i18n/copy.ts` in Arabic and English. Tests fail if any string is empty or the placeholders differ.
+- Languages other than Arabic and English are drafts (`reviewed: false` in `locales/index.ts`) until a native speaker checks them; the handover screen and the report say so.
+- Pilgrim headings show the pilgrim's language with Arabic underneath for the volunteer (English if the pilgrim reads Arabic). Arabic and Urdu are right-to-left.
+- The category is shown with text, an icon and color together, never color alone. Urgent is solid red; incomplete is neutral grey so it never reads as "fine".
+- Wording is screening language only: "concern," "risk," "see the medical team." Never diagnosis or treatment.
 - The pressure map shows 8 zones of relative load. No kPa, continuous heatmap, gait, arch index or foot type: 8 FSRs can't measure them.
 - Colors and type come from `src/styles/tokens.css` only.
 
@@ -95,14 +103,14 @@ interface RiskResult {
 
 - No backend and no network calls, apart from Google Fonts. The ESP32 connects over a local USB cable (Web Serial), and it only works after the person picks the port. Static files from our own origin (like `public/models/station.glb`) are fine.
 - No real pilgrim data in the repo, in fixtures or in screenshots. Use invented records only.
-- The QR code encodes risk level, referral, flagged zones and a "simulated" marker only, with no identifiers.
+- The QR code encodes the category, referral, flagged zones and a "simulated" marker only, with no identifiers or card data.
 - Before any real person is screened: resolve implementation-plan open question 1 (SFDA, PDPL, infection control) and record it as an ADR.
 
 ## 8. Definition of Done checklist
 
 - [ ] `npm run typecheck`, `npm test` and `npm run build` pass
-- [ ] Rule changes have tests for every affected rule and all 3 scenarios
-- [ ] New strings exist in `ar` and `en`; RTL checked in the browser
+- [ ] Rule changes have tests for every affected rule and all 4 scenarios
+- [ ] New pilgrim strings exist in all 11 locales (staff strings in `ar` and `en`); RTL checked in the browser
 - [ ] The simulated badge is visible wherever simulated data appears
 - [ ] No identifiers or real data added
 - [ ] `docs/product/implementation-plan.md` checkboxes updated

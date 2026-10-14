@@ -1,51 +1,65 @@
-import { FLAG_REASONS, RECOMMENDATIONS, RISK_LEVELS, UI, ZONE_NAMES } from '../../i18n/copy';
-import type { RiskResult, ZoneFlag } from '../../models/types';
+import type { ScreeningResult, ZoneFlag } from '../../models/types';
 import { renderFootMap, renderLegend } from '../components/footMap';
-import { bilingualHeading } from '../components/heading';
+import { localeHeading } from '../components/heading';
 import type { ViewContext } from '../context';
-import { ICONS, RISK_ICONS } from '../icons';
+import { CATEGORY_ICONS, ICONS } from '../icons';
 
 function flagItem(ctx: ViewContext, flag: ZoneFlag): string {
-  const foot = flag.foot === 'L' ? UI.leftFoot : UI.rightFoot;
-  return `<li class="flag flag-${flag.reason}">${ICONS.dot}${ctx.t(ZONE_NAMES[flag.zone])} · ${ctx.t(foot)} <span class="note">(${ctx.t(FLAG_REASONS[flag.reason])})</span></li>`;
+  const foot = ctx.l.sides[flag.foot];
+  return `<li class="flag flag-${flag.reason}">${ICONS.dot}${ctx.l.zones[flag.zone]} · ${foot} <span class="note">(${ctx.l.flagReasons[flag.reason]})</span></li>`;
 }
 
-export function renderResult(ctx: ViewContext, result: RiskResult): string {
-  const level = RISK_LEVELS[result.level];
+/** Urgent and high concern get an alert in the pilgrim's language with Arabic (or English) beneath for the volunteer. */
+function alert(ctx: ViewContext, result: ScreeningResult): string {
+  if (!result.refer) return '';
+  const pick = result.stopTesting ? 'urgentAlert' : 'referral';
+  return `<div class="referral${result.stopTesting ? ' is-urgent' : ''}" role="alert">${CATEGORY_ICONS[result.category]}<div><b>${ctx.l[pick]}</b><span>${ctx.lOther[pick]}</span></div></div>`;
+}
+
+function footPane(ctx: ViewContext, result: ScreeningResult): string {
+  const readings = ctx.state.readings;
+  if (result.stopTesting && !readings) {
+    return `${renderFootMap(ctx, { kind: 'idle' }, null)}
+      <p class="stage-hint">${ctx.l.notMeasured}</p>`;
+  }
   const flags = result.zoneFlags.length
     ? result.zoneFlags.map((f) => flagItem(ctx, f)).join('')
-    : `<li class="note">${ctx.t(UI.noMarkedAreas)}</li>`;
-  const referral = result.refer
-    ? `<div class="referral" role="alert">${RISK_ICONS.high}<div><b>${ctx.t(UI.referral)}</b><span>${ctx.tOther(UI.referral)}</span></div></div>`
-    : '';
+    : `<li class="note">${ctx.l.noMarkedAreas}</li>`;
+  return `${renderFootMap(ctx, { kind: 'final' }, readings?.pressure ?? null)}
+    ${renderLegend(ctx)}
+    <h2 class="pane-title">${ctx.l.markedAreas}</h2>
+    <ul class="flags">${flags}</ul>`;
+}
+
+/** Step 5, for the pilgrim: the action category, what to do, and a QR code to keep. */
+export function renderResult(ctx: ViewContext, result: ScreeningResult): string {
+  const { l } = ctx;
   const recommendations = result.recommendations
-    .map((key, i) => `<li style="--i:${i}">${ICONS.check}<span>${ctx.t(RECOMMENDATIONS[key])}</span></li>`)
+    .map((key, i) => `<li style="--i:${i}">${ICONS.check}<span>${l.recommendations[key]}</span></li>`)
     .join('');
 
-  return `<section class="risk-band risk-${result.level}" data-key="result-${result.level}">
-      <div class="verdict">${RISK_ICONS[result.level]}${bilingualHeading(ctx, level.title)}</div>
-      <p class="lede">${ctx.t(level.summary)}</p>
-      ${referral}
+  return `<section class="risk-band risk-${result.category}" data-key="result-${result.category}">
+      <div class="verdict">${CATEGORY_ICONS[result.category]}${localeHeading(ctx, (s) => s.categories[result.category].title)}</div>
+      <p class="lede">${l.categories[result.category].summary}</p>
+      ${alert(ctx, result)}
       <ul class="recommendations">${recommendations}</ul>
       <div class="band-footer">
-        <div class="qr" role="img" aria-label="${ctx.t(UI.qrLabel)}"><canvas data-qr></canvas></div>
-        <div><p>${ctx.t(UI.qrNote)}</p><p>${ctx.t(UI.illustrativeRules)}</p></div>
+        <div class="qr" role="img" aria-label="${l.qrLabel}"><canvas data-qr></canvas></div>
+        <div><p>${l.qrNote}</p><p>${l.provisional}</p></div>
       </div>
     </section>
     <aside class="foot-pane">
-      ${renderFootMap(ctx, { kind: 'final' }, ctx.state.readings?.pressure ?? null)}
-      ${renderLegend(ctx)}
-      <h2 class="pane-title">${ctx.t(UI.markedAreas)}</h2>
-      <ul class="flags">${flags}</ul>
-      <div class="row">
-        <button type="button" class="btn btn-primary btn-small" data-action="navigate" data-screen="start">${ctx.t(UI.nextPilgrim)}</button>
-        <button type="button" class="btn btn-ghost btn-small" data-action="navigate" data-screen="volunteer">${ctx.t(UI.volunteerList)}</button>
+      ${footPane(ctx, result)}
+      <div class="row push-end">
+        <button type="button" class="btn btn-primary btn-small" data-action="new-screening">${l.nextPilgrim}</button>
+        <button type="button" class="btn btn-ghost btn-small" data-action="navigate" data-screen="volunteer">${l.volunteerList}</button>
       </div>
     </aside>`;
 }
 
-/** Short, non-identifying summary encoded in the result QR code. */
-export function qrPayload(result: RiskResult): string {
+/** Short, non-identifying summary encoded in the result QR code. Never the card or the pilgrim's details. */
+export function qrPayload(result: ScreeningResult): string {
   const zones = result.zoneFlags.map((f) => `${f.foot}-${f.zone}`).join(',') || 'none';
-  return `FOOTGUARD v0 | ${result.level} | refer=${result.refer ? 'yes' : 'no'} | zones=${zones} | simulated`;
+  return `FOOTGUARD v1 | ${result.category} | refer=${result.refer ? 'yes' : 'no'} | zones=${zones} | simulated`;
 }
+
