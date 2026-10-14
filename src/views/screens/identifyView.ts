@@ -1,6 +1,5 @@
 import { NATIONALITY_NAMES, UI } from '../../i18n/copy';
 import { MAX_CARD_CODE_LENGTH, SAMPLE_CARDS } from '../../models/pilgrimCards';
-import { renderFootMap } from '../components/footMap';
 import { bilingualHeading } from '../components/heading';
 import type { ViewContext } from '../context';
 import { escapeHtml } from '../html';
@@ -43,14 +42,13 @@ export function renderIdentify(ctx: ViewContext): string {
         <button type="submit" class="btn btn-primary btn-small">${ctx.t(UI.lookUp)}</button>
       </form>
       ${cardError(ctx)}
-      ${sampleCards(ctx)}
+      <p class="note">${ctx.t(UI.prepHint)}</p>
       <div class="row push-end">
         <button type="button" class="btn btn-ghost btn-small" data-action="no-card">${ctx.t(UI.noCard)}${ICONS.arrow}</button>
       </div>
     </section>
-    <aside class="foot-pane stage-pane">
+    <aside class="foot-pane stage-pane identify-pane">
       <a class="stage-link" href="${station3dHref(ctx.language)}">${ICONS.cube}<span>${ctx.t(UI.exploreStation)}</span>${ICONS.arrow}</a>
-      ${renderFootMap(ctx, { kind: 'idle' }, null)}
-      <p class="stage-hint">${ctx.t(UI.prepHint)}</p>
+      ${sampleCards(ctx)}
     </aside>`;
 }

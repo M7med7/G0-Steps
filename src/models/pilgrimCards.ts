@@ -16,6 +16,7 @@ export const SAMPLE_CARDS: readonly PilgrimProfile[] = [
   { cardId: 'FG-SAMPLE-004', name: 'Fatma Yıldız', age: 66, sex: 'female', nationality: 'TR' },
   { cardId: 'FG-SAMPLE-005', name: 'Aminu Bello', age: 54, sex: 'male', nationality: 'NG' },
   { cardId: 'FG-SAMPLE-006', name: 'Khadija Ahmed', age: 60, sex: 'female', nationality: 'EG' },
+  { cardId: 'FG-SAMPLE-007', name: 'Abdulrahman Saleh', age: 67, sex: 'male', nationality: 'SA' },
 ];
 
 /** The language a nationality most likely reads, so the pilgrim's screen opens in it. They can change it. */

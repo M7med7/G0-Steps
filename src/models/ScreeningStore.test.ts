@@ -108,7 +108,7 @@ describe('ScreeningStore', () => {
     });
 
     it('suggests a language for every sample card', () => {
-      expect(SAMPLE_CARDS.map(suggestedLocale)).toEqual(['id', 'ur', 'bn', 'tr', 'ha', 'ar']);
+      expect(SAMPLE_CARDS.map(suggestedLocale)).toEqual(['id', 'ur', 'bn', 'tr', 'ha', 'ar', 'ar']);
     });
   });
 
