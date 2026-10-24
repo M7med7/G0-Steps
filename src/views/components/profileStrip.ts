@@ -14,6 +14,5 @@ export function profileStrip(ctx: ViewContext): string {
       <span>${ctx.t(UI.age)} ${escapeHtml(profile.age)}</span>
       <span>${ctx.t(SEX_NAMES[profile.sex])}</span>
       <span>${country ? ctx.t(country) : escapeHtml(profile.nationality)}</span>
-      <span class="chip">${ctx.t(UI.sampleRecord)}</span>
     </div>`;
 }

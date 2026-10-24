@@ -30,8 +30,8 @@ export const fr: LocaleStrings = {
       why: 'Le diabète peut diminuer la sensibilité des pieds et ralentir la cicatrisation.',
     },
     ulcerHistory: {
-      question: 'Avez-vous déjà eu un ulcère du pied, une plaie qui a mis longtemps à guérir, ou une amputation d’un orteil ou du pied ?',
-      short: 'Ulcère ou amputation passés',
+      question: 'Avez-vous déjà eu un ulcère du pied, une plaie qui a mis longtemps à guérir, une amputation d’un orteil ou du pied, ou un pied de Charcot ?',
+      short: 'Ulcère, amputation ou Charcot passés',
       why: 'Un ancien ulcère du pied est le signe le plus fort qu’il peut revenir.',
     },
     pain: {

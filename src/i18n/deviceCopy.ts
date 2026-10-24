@@ -18,7 +18,8 @@ export const DEVICE_UI = {
   explode: { ar: 'فكّ الطبقات', en: 'Explode' },
   assemble: { ar: 'تجميع', en: 'Assemble' },
   openApp: { ar: 'تطبيق الفحص', en: 'Screening app' },
-  language: { ar: 'English', en: 'العربية' },
+  chooseLanguage: { ar: 'اختر اللغة', en: 'Choose language' },
+  languageNote: { ar: 'هذه الصفحة بالعربية أو الإنجليزية.', en: 'This page is in Arabic or English.' },
   hint: {
     ar: 'اسحب للتدوير · مرّر للتكبير · اضغط على طبقة',
     en: 'Drag to rotate · scroll to zoom · tap a layer',

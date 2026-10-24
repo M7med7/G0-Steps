@@ -85,7 +85,7 @@ interface ScreeningResult {
 - Design for 1280×800 landscape, and check every pilgrim screen fits in all 11 languages. Touch targets are at least 60 px (84 px for primary actions, 120 px for yes/no). Make sure it reads at arm's length.
 - Support Arabic (default) and English. Use CSS logical properties so RTL works without overrides. The foot map is never mirrored.
 - Anything a pilgrim reads (handover, questions, scan, result, shared components) lives in `src/i18n/locales/<lang>.ts`, one typed `LocaleStrings` file per language, so a missing string fails the type check. Staff-only copy (card, exam, clinical report, volunteer list) lives in `src/i18n/copy.ts` in Arabic and English. Tests fail if any string is empty or the placeholders differ.
-- Languages other than Arabic and English are drafts (`reviewed: false` in `locales/index.ts`) until a native speaker checks them; the handover screen and the report say so.
+- Languages other than Arabic and English are drafts (`reviewed: false` in `locales/meta.ts`) until a native speaker checks them. The screens don't label them; the review is tracked in the implementation plan.
 - Pilgrim headings show the pilgrim's language with Arabic underneath for the volunteer (English if the pilgrim reads Arabic). Arabic and Urdu are right-to-left.
 - The category is shown with text, an icon and color together, never color alone. Urgent is solid red; incomplete is neutral grey so it never reads as "fine".
 - Wording is screening language only: "concern," "risk," "see the medical team." Never diagnosis or treatment.

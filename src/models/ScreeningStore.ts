@@ -57,6 +57,8 @@ export interface AppState {
   readonly weakSensors: readonly number[];
   /** The team's demo drawer (scenarios, sensor source, calibration). Closed by default so the app looks like the product. */
   readonly demoOpen: boolean;
+  /** The language menu in the top bar. */
+  readonly languageMenuOpen: boolean;
 }
 
 type Listener = (state: AppState) => void;
@@ -90,6 +92,7 @@ export function createInitialState(scenario: ScenarioName = 'moderate', calibrat
     calibrating: null,
     weakSensors: [],
     demoOpen: false,
+    languageMenuOpen: false,
   };
 }
 
@@ -109,9 +112,15 @@ export const isScanComplete = (state: AppState): boolean =>
 /** An urgent finding in the exam or the answers stops routine device testing: no scan. */
 export const isTestingStopped = (state: AppState): boolean => hasUrgentFinding(state.answers, state.exam);
 
+/** A real-board reading is unreliable while calibration reports a sensor that did not respond. */
+const isReadingReliable = (state: AppState, readings: SensorReadings): boolean =>
+  readings.source !== 'esp32' || state.weakSensors.length === 0;
+
 /** Derived, never stored: the result exists once a scan has finished, or straight away when testing stopped. */
 export function selectResult(state: AppState): ScreeningResult | null {
-  if (state.readings && isScanComplete(state)) return assessScreening(state.answers, state.exam, state.readings.pressure);
+  if (state.readings && isScanComplete(state)) {
+    return assessScreening(state.answers, state.exam, state.readings.pressure, isReadingReliable(state, state.readings));
+  }
   if (isTestingStopped(state)) return assessScreening(state.answers, state.exam, null);
   return null;
 }
@@ -147,19 +156,24 @@ export class ScreeningStore {
     const resetQuestions: Partial<AppState> = screen === 'questions' ? { questionIndex: 0 } : {};
     const freshScan: Partial<AppState> =
       screen === 'scan' ? { scanProgress: 0, readings: null, sensorError: null, livePressure: null } : {};
-    this.update({ screen, ...resetQuestions, ...freshScan });
+    this.update({ screen, ...resetQuestions, ...freshScan, languageMenuOpen: false });
   }
 
   setDemoOpen(demoOpen: boolean): void {
     this.update({ demoOpen });
   }
 
+  /** Picking a language also closes the language menu. */
   setLanguage(language: Language): void {
-    this.update({ language });
+    this.update({ language, languageMenuOpen: false });
   }
 
   setLocale(locale: Locale): void {
-    this.update({ locale });
+    this.update({ locale, languageMenuOpen: false });
+  }
+
+  setLanguageMenuOpen(languageMenuOpen: boolean): void {
+    this.update({ languageMenuOpen });
   }
 
   /** Loads a preset: its answers, exam and pressure. Any finished scan is discarded. */

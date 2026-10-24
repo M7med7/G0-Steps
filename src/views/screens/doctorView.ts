@@ -72,9 +72,7 @@ function answers(ctx: ViewContext): string {
       : [];
     return [main, ...followUp];
   }).map(({ short, response }) => `<li class="${responseClass(response)}"><span>${short}</span><b>${responseText(ctx, response)}</b></li>`);
-  const meta = LOCALE_META[state.locale];
-  const draft = meta.reviewed ? '' : ` · ${ctx.t(UI.draftTranslation)}`;
-  return `<p class="note">${ctx.t(UI.answeredIn, { language: meta.nativeName })}${draft}</p>
+  return `<p class="note">${ctx.t(UI.answeredIn, { language: LOCALE_META[state.locale].nativeName })}</p>
     <ul class="answer-grid">${rows.join('')}</ul>`;
 }
 

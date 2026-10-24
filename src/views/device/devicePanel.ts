@@ -2,7 +2,12 @@ import logoUrl from '../../assets/logo.webp';
 import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../../i18n/deviceCopy';
 import { translate, type Bilingual } from '../../i18n/translate';
 import { DEVICE_LAYERS, LAYER_PARTS, layerNumber, type DeviceSelection, type DeviceViewState } from '../../models/deviceLayers';
+import type { Language } from '../../models/types';
+import { renderLanguageMenu } from '../components/languageMenu';
 import { ICONS } from '../icons';
+
+/** The 3D page's copy is Arabic and English only. */
+const DEVICE_LANGUAGES: readonly Language[] = ['ar', 'en'];
 
 type T = (text: Bilingual, vars?: Readonly<Record<string, string | number>>) => string;
 
@@ -12,7 +17,15 @@ export function renderDeviceTopBar(state: DeviceViewState): string {
   return `<a class="d-brand" href="./"><img src="${logoUrl}" alt="" width="34" height="36"><span><b>FootGuard · خطاك</b><small>${t(DEVICE_UI.pageTitle)}</small></span></a>
     <div class="d-actions">
       <button type="button" class="d-btn" data-action="toggle-explode" aria-pressed="${state.exploded}">${t(toggle)}</button>
-      <button type="button" class="d-btn" data-action="toggle-language" lang="${state.language === 'ar' ? 'en' : 'ar'}">${t(DEVICE_UI.language)}</button>
+      ${renderLanguageMenu({
+        choices: DEVICE_LANGUAGES,
+        current: state.language,
+        action: 'set-language',
+        field: 'language',
+        isOpen: state.languageMenuOpen,
+        label: t(DEVICE_UI.chooseLanguage),
+        note: t(DEVICE_UI.languageNote),
+      })}
       <a class="d-btn d-btn-quiet" href="./">${t(DEVICE_UI.openApp)}</a>
     </div>`;
 }

@@ -218,6 +218,17 @@ describe('ScreeningStore', () => {
       expect(selectResult(store.getState())?.category).toBe('high');
     });
 
+    it('marks a real-board scan incomplete while calibration reports a weak sensor', () => {
+      const store = new ScreeningStore(createInitialState('low'));
+      store.setScenario('low');
+      store.setReadings({ ...readings('low'), source: 'esp32' });
+      store.setScanProgress(SENSOR_COUNT);
+      expect(selectResult(store.getState())?.category).toBe('low');
+
+      store.setCalibration(DEFAULT_CALIBRATION, [3]);
+      expect(selectResult(store.getState())?.category).toBe('incomplete');
+    });
+
     it('clamps scan progress to the sensor count', () => {
       const store = new ScreeningStore();
       store.setScanProgress(SENSOR_COUNT + 5);
@@ -259,6 +270,20 @@ describe('ScreeningStore', () => {
     expect(state.deviceStatus).toBe('disconnected');
     expect(state.livePressure).toBeNull();
     expect(usesDevice(state)).toBe(true);
+  });
+
+  it('closes the language menu when a language is picked or the screen changes', () => {
+    const store = new ScreeningStore();
+    expect(store.getState().languageMenuOpen).toBe(false);
+    store.setLanguageMenuOpen(true);
+    store.setLocale('tr');
+    expect(store.getState()).toMatchObject({ locale: 'tr', languageMenuOpen: false });
+    store.setLanguageMenuOpen(true);
+    store.setLanguage('en');
+    expect(store.getState()).toMatchObject({ language: 'en', languageMenuOpen: false });
+    store.setLanguageMenuOpen(true);
+    store.goTo('exam');
+    expect(store.getState().languageMenuOpen).toBe(false);
   });
 
   it('opens and closes the demo drawer, closed at start', () => {

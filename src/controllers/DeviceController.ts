@@ -1,5 +1,5 @@
 import { DEVICE_LAYER_COPY, DEVICE_PART_COPY, DEVICE_UI } from '../i18n/deviceCopy';
-import { directionOf, otherLanguage, translate } from '../i18n/translate';
+import { directionOf, translate } from '../i18n/translate';
 import {
   DEVICE_LAYERS,
   LAYER_PARTS,
@@ -12,6 +12,7 @@ import {
   type DevicePartId,
   type DeviceViewState,
 } from '../models/deviceLayers';
+import { isLanguage } from '../models/types';
 import type { DeviceScene } from '../scene/DeviceScene';
 import { renderDevicePanel, renderDeviceTopBar } from '../views/device/devicePanel';
 
@@ -85,7 +86,10 @@ export class DeviceController {
   }
 
   private onClick(event: MouseEvent): void {
-    const target = (event.target as Element | null)?.closest<HTMLElement>('[data-action]');
+    const clicked = event.target as Element | null;
+    // A click anywhere outside the language menu closes it; the click still does what it was for.
+    if (this.state.languageMenuOpen && !clicked?.closest('[data-lang-picker]')) this.update({ languageMenuOpen: false });
+    const target = clicked?.closest<HTMLElement>('[data-action]');
     if (!target) return;
     const { action } = target.dataset;
     if (action === 'select-layer' && isDeviceLayerId(target.dataset.layer)) this.selectLayer(target.dataset.layer);
@@ -93,12 +97,31 @@ export class DeviceController {
     else if (action === 'overview') this.update({ focus: null });
     else if (action === 'step') this.update({ focus: stepLayer(this.state.focus, target.dataset.step === '-1' ? -1 : 1), exploded: true });
     else if (action === 'toggle-explode') this.update({ exploded: !this.state.exploded, focus: null });
-    else if (action === 'toggle-language') this.update({ language: otherLanguage(this.state.language) });
+    else if (action === 'toggle-language-menu') this.toggleLanguageMenu();
+    else if (action === 'set-language' && isLanguage(target.dataset.language)) {
+      this.update({ language: target.dataset.language, languageMenuOpen: false });
+      this.focusLanguageTrigger();
+    }
+  }
+
+  /** The top bar is redrawn on every update, so focus is restored by query rather than by element. */
+  private toggleLanguageMenu(): void {
+    const isOpening = !this.state.languageMenuOpen;
+    this.update({ languageMenuOpen: isOpening });
+    if (isOpening) this.el.top.querySelector<HTMLElement>('.lang-option[aria-pressed="true"]')?.focus();
+    else this.focusLanguageTrigger();
+  }
+
+  private focusLanguageTrigger(): void {
+    this.el.top.querySelector<HTMLElement>('.lang-trigger')?.focus();
   }
 
   private onKey(event: KeyboardEvent): void {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
-    if (event.key === 'Escape' && this.state.focus) {
+    if (event.key === 'Escape' && this.state.languageMenuOpen) {
+      this.update({ languageMenuOpen: false });
+      this.focusLanguageTrigger();
+    } else if (event.key === 'Escape' && this.state.focus) {
       this.update({ focus: null });
     } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();

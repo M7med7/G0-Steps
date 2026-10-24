@@ -30,8 +30,8 @@ export const ms: LocaleStrings = {
       why: 'Diabetes boleh mengurangkan rasa pada kaki dan melambatkan penyembuhan luka.',
     },
     ulcerHistory: {
-      question: 'Pernahkah anda mengalami ulser kaki, luka yang lambat sembuh, atau amputasi jari kaki atau kaki?',
-      short: 'Ulser atau amputasi dahulu',
+      question: 'Pernahkah anda mengalami ulser kaki, luka yang lambat sembuh, amputasi jari kaki atau kaki, atau kaki Charcot?',
+      short: 'Ulser, amputasi atau Charcot dahulu',
       why: 'Ulser kaki yang lalu ialah tanda paling kuat ia boleh berulang.',
     },
     pain: {

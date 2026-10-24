@@ -1,30 +1,19 @@
 import logoUrl from '../assets/logo.webp';
-import { LOCALE_META } from '../i18n/locales';
 import { SENSOR_ORDER } from '../models/pressureProtocol';
 import type { AppState } from '../models/ScreeningStore';
-import { LOCALES, SCENARIO_NAMES, SCREENS, SENSOR_MODES, type DeviceStatus, type Language, type ScenarioName, type ScreenName, type SensorMode } from '../models/types';
+import { SCENARIO_NAMES, SENSOR_MODES, type DeviceStatus, type ScenarioName, type SensorMode } from '../models/types';
 import { morphChildren } from './morph';
 
 /*
- * The team's demo controls, kept out of the product view in a drawer: jump to a screen, load a scenario,
+ * The team's platform controls, kept out of the product view in a drawer: load a simulated scenario,
  * pick the sensor source, connect and calibrate the platform. English only, like other team tools.
+ * Language is chosen from the top bar.
  */
 
-const SCREEN_LABELS: Readonly<Record<ScreenName, string>> = {
-  identify: 'Card scan',
-  exam: 'Volunteer exam',
-  handover: 'Handover',
-  questions: 'Questions',
-  scan: 'Scan',
-  result: 'Pilgrim result',
-  doctor: 'Clinical report',
-  volunteer: 'Volunteer list',
-};
 const SCENARIO_LABELS: Readonly<Record<ScenarioName, string>> = { low: 'Low', moderate: 'Moderate', high: 'High', urgent: 'Urgent' };
-const LANGUAGE_LABELS: Readonly<Record<Language, string>> = { ar: 'العربية', en: 'English' };
 const MODE_LABELS: Readonly<Record<SensorMode, string>> = { preset: 'Preset', fakeDevice: 'Fake ESP32', esp32: 'ESP32 (USB)' };
 const MODE_HINTS: Readonly<Record<SensorMode, string>> = {
-  preset: 'Fixed demo readings from the scenario above.',
+  preset: 'Fixed simulated readings from the scenario above.',
   fakeDevice: 'A stand-in board that streams the real data format. Connect, then run a scan.',
   esp32: 'The real pressure platform over a USB cable (Chrome or Edge).',
 };
@@ -100,24 +89,18 @@ function platform(state: AppState): string {
 }
 
 function drawer(state: AppState): string {
-  const screens = SCREENS.map((s) => ({ value: s, label: SCREEN_LABELS[s] }));
   const scenarios = SCENARIO_NAMES.map((s) => ({ value: s, label: `<span class="dot dot-${s}"></span>${SCENARIO_LABELS[s]}` }));
-  const languages = (['ar', 'en'] as const).map((l) => ({ value: l, label: LANGUAGE_LABELS[l] }));
-  const pilgrimLanguages = LOCALES.map((l) => ({ value: l, label: LOCALE_META[l].nativeName }));
   const modes = SENSOR_MODES.map((m) => ({ value: m, label: MODE_LABELS[m] }));
   return `<header class="demo-head">
       <img src="${logoUrl}" alt="" width="34" height="36">
-      <div><strong>Demo controls</strong><span>For the team. Pilgrims never see this. Scenarios fill the exam and answers.</span></div>
-      <button type="button" class="demo-close" data-action="close-demo" aria-label="Close demo controls">${ICON_CLOSE}</button>
+      <div><strong>Platform controls</strong><span>For the team. Pilgrims never see this. Scenarios fill the exam and answers with simulated data.</span></div>
+      <button type="button" class="demo-close" data-action="close-demo" aria-label="Close platform controls">${ICON_CLOSE}</button>
     </header>
     <div class="demo-body">
-      ${choices('Screen', 'navigate', 'screen', screens, state.screen)}
       ${choices('Scenario', 'set-scenario', 'scenario', scenarios, state.scenario)}
       ${choices('Sensor source', 'set-sensor-mode', 'mode', modes, state.sensorMode)}
       <p class="demo-hint">${MODE_HINTS[state.sensorMode]}</p>
       ${platform(state)}
-      ${choices('Staff language', 'set-language', 'language', languages, state.language)}
-      ${choices('Pilgrim language', 'set-locale', 'locale', pilgrimLanguages, state.locale)}
     </div>`;
 }
 
@@ -130,9 +113,9 @@ export class DemoPanelView {
     const open = state.demoOpen;
     morphChildren(
       this.root,
-      `<button type="button" class="demo-toggle" data-action="toggle-demo" aria-expanded="${open}" aria-controls="demo-drawer" title="Demo controls">${ICON_SLIDERS}<span>Demo controls</span></button>
-       <button type="button" class="demo-scrim" data-action="close-demo" tabindex="-1" aria-label="Close demo controls"></button>
-       <aside class="demo-drawer" id="demo-drawer" aria-label="Demo controls">${drawer(state)}</aside>`,
+      `<button type="button" class="demo-toggle" data-action="toggle-demo" aria-expanded="${open}" aria-controls="demo-drawer" title="Platform controls">${ICON_SLIDERS}<span>Platform controls</span></button>
+       <button type="button" class="demo-scrim" data-action="close-demo" tabindex="-1" aria-label="Close platform controls"></button>
+       <aside class="demo-drawer" id="demo-drawer" aria-label="Platform controls">${drawer(state)}</aside>`,
     );
     this.root.dataset['open'] = String(open);
     // Closed, the drawer can't take focus; opened, focus moves into it.

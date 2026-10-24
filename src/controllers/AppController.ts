@@ -71,7 +71,11 @@ export class AppController {
     root.addEventListener('click', (event) => this.onClick(event));
     root.addEventListener('submit', (event) => this.onSubmit(event));
     root.addEventListener('keydown', (event) => {
-      if (event instanceof KeyboardEvent && event.key === 'Escape' && store.getState().demoOpen) store.setDemoOpen(false);
+      if (!(event instanceof KeyboardEvent) || event.key !== 'Escape') return;
+      if (store.getState().languageMenuOpen) {
+        store.setLanguageMenuOpen(false);
+        root.querySelector<HTMLElement>('[data-lang-picker] .lang-trigger')?.focus();
+      } else if (store.getState().demoOpen) store.setDemoOpen(false);
     });
     win.addEventListener('resize', () => this.deps.kioskView.fit());
     win.addEventListener('hashchange', () => {
@@ -301,13 +305,24 @@ export class AppController {
     }
   }
 
+  /**
+   * After a pick from the language menu the list closes, so focus goes back to its button instead of being lost.
+   * `picker` is looked up before the update: the chosen option is gone from the page after it.
+   */
+  private refocusLanguageTrigger(picker: Element | null): void {
+    picker?.querySelector<HTMLElement>('.lang-trigger')?.focus();
+  }
+
   private onClick(event: Event): void {
     const target = event.target;
     if (!(target instanceof Element)) return;
+    const { store } = this.deps;
+    // A click anywhere outside the language menu closes it; the click still does what it was for.
+    if (store.getState().languageMenuOpen && !target.closest('[data-lang-picker]')) store.setLanguageMenuOpen(false);
     const button = target.closest<HTMLButtonElement>('button[data-action]');
     if (!button) return;
+    const picker = button.closest('[data-lang-picker]');
 
-    const { store } = this.deps;
     const { action, screen, scenario, language, locale, value, mode, step, item, side } = button.dataset;
 
     switch (action) {
@@ -333,7 +348,10 @@ export class AppController {
         store.finishExam();
         break;
       case 'set-locale':
-        if (isLocale(locale)) store.setLocale(locale);
+        if (isLocale(locale)) {
+          store.setLocale(locale);
+          this.refocusLanguageTrigger(picker);
+        }
         break;
       case 'start-questions':
         store.goTo('questions');
@@ -372,7 +390,10 @@ export class AppController {
         }
         break;
       case 'set-language':
-        if (isLanguage(language)) store.setLanguage(language);
+        if (isLanguage(language)) {
+          store.setLanguage(language);
+          this.refocusLanguageTrigger(picker);
+        }
         break;
       case 'set-sensor-mode':
         if (isSensorMode(mode)) void this.setSensorMode(mode);
@@ -390,6 +411,12 @@ export class AppController {
       case 'toggle-demo':
         store.setDemoOpen(!store.getState().demoOpen);
         break;
+      case 'toggle-language-menu': {
+        const isOpening = !store.getState().languageMenuOpen;
+        store.setLanguageMenuOpen(isOpening);
+        if (isOpening) picker?.querySelector<HTMLElement>('.lang-option[aria-pressed="true"]')?.focus();
+        break;
+      }
       case 'close-demo':
         store.setDemoOpen(false);
         break;

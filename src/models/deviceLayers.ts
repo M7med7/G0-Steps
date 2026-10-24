@@ -64,6 +64,8 @@ export interface DeviceViewState {
   readonly language: Language;
   readonly exploded: boolean;
   readonly focus: DeviceFocus;
+  /** The language menu in the top bar. */
+  readonly languageMenuOpen: boolean;
 }
 
 export function focusLayer(layer: DeviceLayerId): DeviceSelection {

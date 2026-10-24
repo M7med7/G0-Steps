@@ -160,6 +160,16 @@ describe('assessScreening', () => {
       expect(run(answers(), exam(), null).category).toBe('incomplete');
     });
 
+    it('is incomplete, never low, when the pressure reading is unreliable', () => {
+      const result = assessScreening(answers(), exam(), EVEN, false);
+      expect(result.category).toBe('incomplete');
+      expect(result.firedRules).toContain('pressure-unreliable');
+    });
+
+    it('lets a high finding outrank an unreliable reading', () => {
+      expect(assessScreening(answers(), exam({ openWound: 'yes' }), EVEN, false).category).toBe('high');
+    });
+
     it('outranks moderate findings', () => {
       expect(run(answers({ footwear: 'yes' }), exam(), null).category).toBe('incomplete');
     });

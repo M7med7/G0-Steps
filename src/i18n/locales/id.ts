@@ -30,8 +30,8 @@ export const id: LocaleStrings = {
       why: 'Diabetes dapat mengurangi rasa di kaki dan memperlambat penyembuhan luka.',
     },
     ulcerHistory: {
-      question: 'Apakah Anda pernah mengalami luka borok di kaki, luka yang lama sembuh, atau amputasi jari kaki atau kaki?',
-      short: 'Riwayat borok atau amputasi',
+      question: 'Apakah Anda pernah mengalami luka borok di kaki, luka yang lama sembuh, amputasi jari kaki atau kaki, atau kaki Charcot?',
+      short: 'Riwayat borok, amputasi atau Charcot',
       why: 'Borok kaki di masa lalu adalah tanda terkuat bahwa borok bisa muncul lagi.',
     },
     pain: {

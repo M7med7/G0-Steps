@@ -319,10 +319,6 @@
   box-shadow: var(--shadow-primary);
 }
 
-.draft-note {
-  color: var(--warning-ink);
-}
-
 /* Result: urgent is the solid alarm colour; incomplete is neutral, so it never reads as "fine". */
 .risk-urgent {
   background: var(--error);

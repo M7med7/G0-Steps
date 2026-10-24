@@ -30,8 +30,8 @@ export const tr: LocaleStrings = {
       why: 'Diyabet ayaklardaki hissi azaltabilir ve yaraların iyileşmesini yavaşlatır.',
     },
     ulcerHistory: {
-      question: 'Daha önce ayağınızda ülser, geç iyileşen bir yara ya da parmak veya ayak kesilmesi (amputasyon) oldu mu?',
-      short: 'Geçmiş ülser veya amputasyon',
+      question: 'Daha önce ayağınızda ülser, geç iyileşen bir yara parmak veya ayak kesilmesi (amputasyon) ya da Charcot ayağı oldu mu?',
+      short: 'Geçmiş ülser, amputasyon veya Charcot',
       why: 'Geçmişteki ayak ülseri, tekrar oluşabileceğinin en güçlü işaretidir.',
     },
     pain: {

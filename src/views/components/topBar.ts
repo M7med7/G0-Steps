@@ -2,11 +2,12 @@ import logoUrl from '../../assets/logo.webp';
 import { UI } from '../../i18n/copy';
 import type { LocaleStrings } from '../../i18n/locales';
 import type { Bilingual } from '../../i18n/translate';
-import { showsSimulatedData } from '../../models/ScreeningStore';
-import type { ScreenName } from '../../models/types';
+import { isPilgrimScreen, showsSimulatedData } from '../../models/ScreeningStore';
+import { LOCALES, type Locale, type ScreenName } from '../../models/types';
 import { station3dHref } from '../links';
 import type { ViewContext } from '../context';
 import { ICONS } from '../icons';
+import { renderLanguageMenu } from './languageMenu';
 
 type Step = keyof LocaleStrings['steps'];
 
@@ -55,7 +56,8 @@ const SHOWS_STATION_LINK: Readonly<Record<ScreenName, boolean>> = {
 
 function stationLink(ctx: ViewContext): string {
   if (!SHOWS_STATION_LINK[ctx.state.screen]) return '';
-  return `<a class="top-link" href="${station3dHref(ctx.language)}">${ICONS.cube}<span>${ctx.l.station3d}</span></a>`;
+  // Icon only, so the bar still fits the result tabs and the language button in every language; the name stays as a tooltip and for screen readers.
+  return `<a class="top-link top-link-icon" href="${station3dHref(ctx.language)}" title="${ctx.l.station3d}">${ICONS.cube}<span class="visually-hidden">${ctx.l.station3d}</span></a>`;
 }
 
 /** Simulated data is always labelled, in Arabic and English. "Live" appears only while the real board is connected. */
@@ -79,9 +81,34 @@ function progressRail(ctx: ViewContext): string {
   return `<ol class="rail">${items}</ol>`;
 }
 
+/** Staff screens have Arabic and English copy only. */
+const STAFF_LANGUAGES: readonly Locale[] = ['ar', 'en'];
+
+/**
+ * The language button, on every screen. Pilgrim screens offer all pilgrim languages; staff screens offer the two
+ * staff languages and say where the rest are.
+ */
+function languagePicker(ctx: ViewContext): string {
+  const { state } = ctx;
+  const isOpen = state.languageMenuOpen;
+  if (isPilgrimScreen(state.screen)) {
+    return renderLanguageMenu({ choices: LOCALES, current: state.locale, action: 'set-locale', field: 'locale', isOpen, label: ctx.l.chooseLanguage });
+  }
+  return renderLanguageMenu({
+    choices: STAFF_LANGUAGES,
+    current: state.language,
+    action: 'set-language',
+    field: 'language',
+    isOpen,
+    label: ctx.l.chooseLanguage,
+    note: ctx.t(UI.staffLanguageNote, { count: LOCALES.length }),
+  });
+}
+
 export function renderTopBar(ctx: ViewContext): string {
   return `<div class="brand"><img class="logo" src="${logoUrl}" alt="" width="45" height="48"><div><b>FootGuard · خطاك</b><small>${ctx.l.brandSub}</small></div></div>
     ${ctx.state.screen === 'result' || ctx.state.screen === 'doctor' ? viewTabs(ctx) : progressRail(ctx)}
     ${stationLink(ctx)}
+    ${languagePicker(ctx)}
     ${sourceBadge(ctx)}`;
 }

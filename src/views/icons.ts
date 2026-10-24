@@ -11,6 +11,7 @@ export const ICONS = {
   dot: '<svg viewBox="0 0 24 24" aria-hidden="true" class="icon-dot"><circle cx="12" cy="12" r="5" fill="currentColor"/></svg>',
   cube: svg('<path d="M12 2.8l8 4.4v9.6l-8 4.4-8-4.4V7.2z"/><path d="M4 7.2l8 4.4 8-4.4M12 11.6v9.6"/>'),
   card: svg('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7 9v6M10 9v6M13 9v6M16 9v6"/>'),
+  globe: svg('<circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.6 2.7 3.9 5.9 3.9 9.5s-1.3 6.8-3.9 9.5c-2.6-2.7-3.9-5.9-3.9-9.5s1.3-6.8 3.9-9.5z"/>'),
 } as const;
 
 export const CATEGORY_ICONS: Readonly<Record<ActionCategory, string>> = {

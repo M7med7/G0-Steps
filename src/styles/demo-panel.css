@@ -280,3 +280,9 @@
 .dot-high {
   background: var(--error);
 }
+
+/* Urgent: the same red with a dark ring, so it differs from High by more than colour. */
+.dot-urgent {
+  background: var(--error);
+  box-shadow: 0 0 0 2px var(--error-ink);
+}

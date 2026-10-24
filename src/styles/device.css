@@ -11,6 +11,8 @@ body.device-page {
 }
 
 .d-top {
+  position: relative;
+  z-index: 20;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -83,6 +85,19 @@ body.device-page {
 
 .d-btn-quiet {
   background: transparent;
+}
+
+/* The language button takes the page's glass look; its menu keeps the shared style. */
+.d-top .lang-trigger {
+  border: 1px solid var(--device-line);
+  background: var(--device-glass);
+  color: var(--device-ink);
+}
+
+.d-top .lang-trigger:hover,
+.d-top .lang-trigger[aria-expanded='true'] {
+  background: var(--surface-raised);
+  color: var(--device-ink);
 }
 
 .d-main {

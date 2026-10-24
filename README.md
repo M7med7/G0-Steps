@@ -15,8 +15,10 @@ npm run dev        # http://localhost:5173
 
 The app fills the window like the real kiosk would. You can link to a screen directly, for example `#result`.
 
-**Demo controls.** The small round button in the bottom corner opens the team's Demo drawer: jump to a screen, load a scenario, switch language, and pick where pressure comes from:
-- **Preset:** the low, moderate and high demo scenarios.
+**Language.** The globe button in the top bar lists the languages for the current screen: 11 on the pilgrim's screens, Arabic and English on the staff screens and the 3D page.
+
+**Platform controls.** The small round button in the bottom corner opens the team's drawer: load a simulated scenario and pick where pressure comes from:
+- **Preset:** the low, moderate, high and urgent simulated scenarios.
 - **Fake ESP32:** a stand-in that streams the board's real data format through the same code, so you can watch a live scan without hardware.
 - **ESP32 (USB):** the real platform over a cable, in Chrome or Edge.
 

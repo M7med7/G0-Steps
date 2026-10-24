@@ -29,8 +29,8 @@ export const en: LocaleStrings = {
       why: 'Diabetes can reduce feeling in the feet and slow healing.',
     },
     ulcerHistory: {
-      question: 'Have you ever had a foot ulcer, a wound that healed slowly, or a toe or foot amputation?',
-      short: 'Past ulcer or amputation',
+      question: 'Have you ever had a foot ulcer, a wound that healed slowly, a toe or foot amputation, or Charcot foot?',
+      short: 'Past ulcer, amputation or Charcot',
       why: 'A past foot ulcer is the strongest sign that one may come back.',
     },
     pain: {
@@ -103,8 +103,8 @@ export const en: LocaleStrings = {
     low: { title: 'Low concern', summary: 'Your feet look fine today. Keep up daily foot care.' },
     moderate: { title: 'Moderate concern', summary: 'Some signs need attention. Follow the advice below, and come back if they get worse.' },
     high: { title: 'High concern', summary: 'Please see the medical team today.' },
-    urgent: { title: 'Urgent', summary: 'You need medical care now. The volunteer will take you.' },
-    incomplete: { title: 'Check not finished', summary: 'We could not finish your check. The volunteer will complete or repeat it.' },
+    urgent: { title: 'Urgent override', summary: 'You need medical care now. The volunteer will take you.' },
+    incomplete: { title: 'Incomplete assessment', summary: 'We could not finish your check. The volunteer will complete or repeat it.' },
   },
   recommendations: {
     seeMedicalNow: 'Go to medical care now, with the volunteer.',

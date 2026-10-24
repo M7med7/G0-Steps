@@ -42,6 +42,8 @@ export interface RuleInput {
   readonly exam: ExamFindings;
   /** Null when there is no pressure reading (the scan failed, or was skipped for an urgent finding). */
   readonly pressure: ZoneFindings | null;
+  /** False when the reading came from sensors that failed calibration, so its zones can't be trusted. */
+  readonly isPressureReliable: boolean;
 }
 
 export interface RiskRule {
@@ -195,6 +197,13 @@ export const RULES: readonly RiskRule[] = [
     category: 'incomplete',
     recommendations: ['completeCheck'],
     when: ({ pressure }) => pressure === null,
+  },
+  {
+    id: 'pressure-unreliable',
+    source: cite('sheetSafety'),
+    category: 'incomplete',
+    recommendations: ['completeCheck'],
+    when: ({ pressure, isPressureReliable }) => pressure !== null && !isPressureReliable,
   },
 
   // ---------------------------------------------------------------- moderate concern

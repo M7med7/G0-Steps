@@ -1,4 +1,3 @@
-import { UI } from '../../i18n/copy';
 import { LOCALE_META } from '../../i18n/locales';
 import { LOCALES } from '../../models/types';
 import { renderFootMap } from '../components/footMap';
@@ -16,7 +15,6 @@ function languageGrid(ctx: ViewContext): string {
 
 /** Step 3 begins: the volunteer hands the station over and the pilgrim picks their language. */
 export function renderHandover(ctx: ViewContext): string {
-  const draft = LOCALE_META[ctx.locale].reviewed ? '' : `<p class="note draft-note">${ctx.t(UI.draftTranslation)}</p>`;
   return `<section class="guide handover">
       ${localeHeading(ctx, (s) => s.handoverTitle)}
       <p class="lede">${ctx.l.handoverLede}</p>
@@ -28,6 +26,5 @@ export function renderHandover(ctx: ViewContext): string {
     <aside class="foot-pane handover-pane">
       <h2 class="pane-title">${ctx.l.chooseLanguage}</h2>
       ${languageGrid(ctx)}
-      ${draft}
     </aside>`;
 }

@@ -10,8 +10,11 @@ import type { Bilingual } from './translate';
 export const UI = {
   simulated: { ar: 'بيانات تجريبية', en: 'Simulated data' },
   liveSensors: { ar: 'مستشعرات حية', en: 'Live sensors' },
+  staffLanguageNote: {
+    ar: 'شاشات المتطوع والطبيب بالعربية أو الإنجليزية. يختار الحاج من {count} لغة عند استلام المحطة.',
+    en: 'Volunteer and clinician screens are in Arabic or English. The pilgrim picks from {count} languages at handover.',
+  },
   platformOffline: { ar: 'المنصة غير متصلة', en: 'Platform not connected' },
-  draftTranslation: { ar: 'ترجمة أولية لم يراجعها متحدث أصلي', en: 'Draft translation, not yet checked by a native speaker' },
 
   identifyTitle: { ar: 'امسح بطاقة الحاج', en: "Scan the pilgrim's card" },
   identifyLede: {
@@ -22,10 +25,6 @@ export const UI = {
   cardPlaceholder: { ar: 'بانتظار الماسح…', en: 'Waiting for the scanner…' },
   lookUp: { ar: 'بحث', en: 'Look up' },
   sampleCards: { ar: 'بطاقات تجريبية', en: 'Sample cards' },
-  sampleCardsNote: {
-    ar: 'صيغة البطاقة الحقيقية غير معروفة بعد، لذلك يقبل النموذج هذه البطاقات المختلَقة فقط.',
-    en: "The real card format isn't known yet, so the prototype only accepts these invented cards.",
-  },
   noCard: { ar: 'متابعة بلا بطاقة', en: 'Continue without a card' },
   cardEmpty: { ar: 'لم يصل رمز من الماسح. امسح البطاقة مرة أخرى.', en: 'No code came from the scanner. Scan the card again.' },
   cardUnknown: {
@@ -43,7 +42,6 @@ export const UI = {
   sex: { ar: 'الجنس', en: 'Sex' },
   nationality: { ar: 'الجنسية', en: 'Nationality' },
   screenLanguage: { ar: 'لغة الشاشة', en: 'Screen language' },
-  sampleRecord: { ar: 'سجل تجريبي', en: 'Sample record' },
   anonymous: { ar: 'بلا بطاقة', en: 'No card' },
 
   examTitle: { ar: 'افحص القدمين', en: 'Examine both feet' },
@@ -150,14 +148,14 @@ export const EXAM_GROUP_COPY: Readonly<Record<ExamGroup, { readonly title: Bilin
 };
 
 export const EXAM_COPY: Readonly<Record<ExamKey, Bilingual>> = {
-  openWound: { ar: 'جرح مفتوح أو قرحة', en: 'Open wound or ulcer' },
+  openWound: { ar: 'جرح مفتوح أو قرحة أو آفة تتفاقم', en: 'Open wound, ulcer or worsening lesion' },
   blister: { ar: 'نفطة (بثرة)', en: 'Blister' },
   callus: { ar: 'ثفن (تصلّب الجلد)', en: 'Callus' },
   deformity: { ar: 'تشوّه (مثل الإبهام الأروح أو الأصابع المخلبية)', en: 'Deformity (e.g. bunion, claw toes)' },
   redness: { ar: 'احمرار', en: 'Redness' },
   swelling: { ar: 'تورّم', en: 'Swelling' },
   lossOfSensation: { ar: 'فقدان الإحساس الواقي (خيط 10 غرامات)', en: 'Loss of protective sensation (10-g monofilament)' },
-  reducedPulses: { ar: 'ضعف نبض القدم أو غيابه', en: 'Reduced or absent foot pulses' },
+  reducedPulses: { ar: 'ضعف نبض القدم أو غيابه، أو ضعف تروية معروف', en: 'Reduced or absent foot pulses, or known poor circulation' },
   spreadingInfection: { ar: 'عدوى منتشرة أو أعراض عامة', en: 'Spreading infection, or looks unwell' },
   hotSwollenFoot: { ar: 'قدم ساخنة وحمراء ومتورمة حديثًا', en: 'New hot, red, swollen foot' },
   coldPaleFoot: { ar: 'قدم باردة أو شاحبة فجأة', en: 'Sudden cold or pale foot' },
@@ -238,9 +236,9 @@ export const RULE_COPY: Readonly<Record<string, Bilingual>> = {
   'cannot-bear-weight': { ar: 'إصابة شديدة أو تعذر تحمل الوزن', en: 'Significant injury or cannot bear weight' },
   'pain-stops-walking': { ar: 'ألم يمنع المشي', en: 'Pain stops walking' },
   'loss-of-sensation': { ar: 'فقدان الإحساس الواقي', en: 'Loss of protective sensation' },
-  'poor-circulation': { ar: 'ضعف نبض القدم (اشتباه ضعف التروية)', en: 'Reduced pulses (suspected poor circulation)' },
-  'ulcer-history': { ar: 'قرحة أو بتر سابق', en: 'Previous ulcer or amputation' },
-  'open-wound': { ar: 'جرح مفتوح أو قرحة في الفحص', en: 'Open wound or ulcer on exam' },
+  'poor-circulation': { ar: 'ضعف تروية معروف أو مشتبه (ضعف النبض)', en: 'Known or suspected poor circulation (reduced pulses)' },
+  'ulcer-history': { ar: 'قرحة أو بتر أو قدم شاركو سابقًا', en: 'Previous ulcer, amputation or Charcot foot' },
+  'open-wound': { ar: 'جرح مفتوح أو قرحة أو آفة تتفاقم في الفحص', en: 'Open wound, ulcer or worsening lesion on exam' },
   'local-infection-signs': { ar: 'احمرار أو تورم أو صديد جديد', en: 'New redness, swelling, warmth or discharge' },
   'lesion-on-vulnerable-foot': { ar: 'آفة جلدية في قدم معرضة للخطر', en: 'Skin lesion on a vulnerable foot' },
   'hot-swollen-foot': { ar: 'قدم ساخنة وحمراء ومتورمة', en: 'Hot, red, swollen foot' },
@@ -248,6 +246,7 @@ export const RULE_COPY: Readonly<Record<string, Bilingual>> = {
   'exam-not-finished': { ar: 'بنود فحص لم تُسجّل', en: 'Exam items not recorded' },
   'sensation-or-circulation-unclear': { ar: 'نتيجة الإحساس أو التروية غير واضحة', en: 'Sensation or circulation result unclear' },
   'no-pressure-reading': { ar: 'لا توجد قراءة ضغط', en: 'No pressure reading' },
+  'pressure-unreliable': { ar: 'قراءة الضغط غير موثوقة (حساس ضعيف عند المعايرة)', en: 'Pressure reading unreliable (weak sensor at calibration)' },
   'footwear-rubbing': { ar: 'حذاء جديد أو يحتك', en: 'New or rubbing footwear' },
   'heavy-walking-or-exposure': { ar: 'مشي كثير أو حرارة أو رطوبة', en: 'Heavy walking, heat or wet feet' },
   'callus-or-deformity': { ar: 'ثفن أو تشوه', en: 'Callus or deformity' },

@@ -22,7 +22,6 @@ function sampleCards(ctx: ViewContext): string {
   return `<section class="sample-cards" aria-label="${ctx.t(UI.sampleCards)}">
       <h2 class="pane-title">${ctx.t(UI.sampleCards)}</h2>
       <div class="sample-grid">${cards}</div>
-      <p class="note">${ctx.t(UI.sampleCardsNote)}</p>
     </section>`;
 }
 

@@ -59,12 +59,12 @@ describe('renderDoctor', () => {
     expect(html).toContain('No pressure reading');
   });
 
-  it('shows the pilgrim language, flags a draft translation, and shows the card as a sample record', () => {
+  it('shows the pilgrim language and the card, with no draft or sample labels', () => {
     const html = render(stateFor('low', { locale: 'ur', profile: SAMPLE_CARDS[1] ?? null }));
     expect(html).toContain('Answered in اردو');
-    expect(html).toContain('Draft translation');
     expect(html).toContain('Muhammad Bilal');
-    expect(html).toContain('Sample record');
+    expect(html).not.toContain('Draft translation');
+    expect(html).not.toContain('Sample record');
   });
 
   it('escapes the pilgrim name', () => {

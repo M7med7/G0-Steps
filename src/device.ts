@@ -1,6 +1,7 @@
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/device.css';
+import './styles/language-menu.css';
 
 import { DEVICE_UI } from './i18n/deviceCopy';
 import { isLanguage, type Language } from './models/types';
@@ -65,7 +66,7 @@ async function start(): Promise<void> {
       hint: requireElement('device-hint'),
     },
     // Starts assembled, then opens up, so the first thing people see is the layers coming apart.
-    { language, exploded: true, focus: null },
+    { language, exploded: true, focus: null, languageMenuOpen: false },
   );
   scene.setExploded(false, false);
   controller.start(document);

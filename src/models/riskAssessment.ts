@@ -50,10 +50,11 @@ export function findZoneFlags(pressure: PressureMap): ZoneFindings {
   };
 }
 
-const ruleInput = (answers: RiskAnswers, exam: ExamFindings, pressure: PressureMap | null): RuleInput => ({
+const ruleInput = (answers: RiskAnswers, exam: ExamFindings, pressure: PressureMap | null, isPressureReliable = true): RuleInput => ({
   answers,
   exam,
   pressure: pressure ? findZoneFlags(pressure) : null,
+  isPressureReliable,
 });
 
 /** True when the questions or exam already show an urgent finding, so routine device testing stops. */
@@ -65,9 +66,15 @@ export function hasUrgentFinding(answers: RiskAnswers, exam: ExamFindings): bool
 /**
  * Pure: the same answers, exam and pressure always give the same result.
  * `pressure` is null when there is no reading; that alone makes the assessment incomplete unless something outranks it.
+ * An unreliable reading (`isPressureReliable` false) does the same, so the station never reports "low" from it.
  */
-export function assessScreening(answers: RiskAnswers, exam: ExamFindings, pressure: PressureMap | null): ScreeningResult {
-  const input = ruleInput(answers, exam, pressure);
+export function assessScreening(
+  answers: RiskAnswers,
+  exam: ExamFindings,
+  pressure: PressureMap | null,
+  isPressureReliable = true,
+): ScreeningResult {
+  const input = ruleInput(answers, exam, pressure, isPressureReliable);
   const fired = RULES.filter((rule) => rule.when(input));
 
   const category = fired.reduce<ActionCategory>(

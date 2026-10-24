@@ -30,6 +30,8 @@ html.kiosk-fullscreen body {
 
 /* Top bar: a floating sheet with the brand, the step rail (or the result tabs) and the data-source badge. */
 .k-top {
+  position: relative;
+  z-index: 20;
   height: 72px;
   flex: none;
   display: flex;
@@ -161,6 +163,12 @@ html.kiosk-fullscreen body {
   height: 20px;
 }
 
+.top-link-icon {
+  width: 44px;
+  justify-content: center;
+  padding: 0;
+}
+
 /* Data-source badge: simulated (amber), live (green) or platform not connected (grey). It can't be hidden. */
 .sim-badge {
   display: inline-flex;
@@ -219,6 +227,7 @@ html.kiosk-fullscreen body {
   color: var(--text-muted);
   font-size: 17px;
   font-weight: 500;
+  white-space: nowrap;
   transition: background-color var(--dur-short) var(--ease-out), color var(--dur-short) var(--ease-out),
     box-shadow var(--dur-short) var(--ease-out);
 }

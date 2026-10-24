@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { DeviceViewState } from '../../models/deviceLayers';
 import { renderDevicePanel, renderDeviceTopBar } from './devicePanel';
 
-const overview: DeviceViewState = { language: 'en', exploded: true, focus: null };
+const overview: DeviceViewState = { language: 'en', exploded: true, focus: null, languageMenuOpen: false };
 
 describe('device panel', () => {
   it('lists all eight layers as buttons in the overview', () => {

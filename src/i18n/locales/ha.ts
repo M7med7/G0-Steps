@@ -30,8 +30,8 @@ export const ha: LocaleStrings = {
       why: 'Ciwon suga na iya rage jin kafa kuma ya jinkirta warkewar rauni.',
     },
     ulcerHistory: {
-      question: 'Ka taɓa samun gyambo a kafa, ko raunin da ya daɗe bai warke ba, ko an yanke maka yatsa ko kafa?',
-      short: 'Gyambo ko yanke kafa a baya',
+      question: 'Ka taɓa samun gyambo a kafa, ko raunin da ya daɗe bai warke ba, ko an yanke maka yatsa ko kafa, ko ciwon kafa na Charcot?',
+      short: 'Gyambo, yanke kafa ko Charcot a baya',
       why: 'Gyambon kafa da ya taɓa faruwa shi ne babban alamar zai iya dawowa.',
     },
     pain: {
